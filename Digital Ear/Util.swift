@@ -1,0 +1,95 @@
+//
+//  Util.swift
+//  Digital Ear
+//
+//  Created by Alex Reidy on 3/7/15.
+//  Copyright (c) 2015 Alex Reidy. All rights reserved.
+//
+
+import Foundation
+import AVFoundation
+
+let MAX_REC_DURATION: Double = 5 // seconds
+let DOCUMENT_DIR = NSHomeDirectory() + "/Documents/"
+
+let utilAudioSession = AVAudioSession()
+var utilAudioRecorder: AVAudioRecorder?
+var utilAudioPlayer: AVAudioPlayer?
+
+let defaultAudioSettings: [NSObject : AnyObject] = [
+    AVFormatIDKey: kAudioFormatLinearPCM,
+    AVLinearPCMIsFloatKey: true,
+    AVNumberOfChannelsKey: 1,
+    AVSampleRateKey: 44100,
+]
+
+func now() -> Int { return time(nil) }
+
+func sign(x: Float) -> Int {
+    if x < 0 { return -1 }
+    return 1
+}
+
+func startRecordingAudio(toPath path: String, delegate: AVAudioRecorderDelegate? = nil, seconds: Double = MAX_REC_DURATION) {
+    // if utilAudioRecorder == nil ??? don't want to record while recording...
+    utilAudioRecorder = AVAudioRecorder(URL: NSURL(fileURLWithPath: path),
+        settings: defaultAudioSettings, error: nil)
+    if let recorder = utilAudioRecorder {
+        recorder.delegate = delegate
+        recorder.recordForDuration(seconds)
+    }
+}
+
+func stopRecordingAudio() {
+    if let recorder = utilAudioRecorder {
+        recorder.stop()
+        utilAudioRecorder = nil
+    }
+}
+
+func recording() -> Bool {
+    if let recorder = utilAudioRecorder {
+        return recorder.recording
+    }
+    return false
+}
+
+func playAudio(filePath: String) {
+    utilAudioSession.setCategory(AVAudioSessionCategoryPlayAndRecord, error: nil)
+    utilAudioPlayer = AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: filePath), error:nil)
+    if let player = utilAudioPlayer {
+        player.volume = 1
+        if player.play() {
+            println("playing")
+        } else {
+            println("failed to play")
+        }
+    } else {
+        println("player is nil")
+    }
+}
+
+func extractSamplesFromWAV(path: String) -> [Float] {
+    var af = AVAudioFile(forReading: NSURL(fileURLWithPath: path),
+        commonFormat: AVAudioCommonFormat.PCMFormatFloat32,
+        interleaved: false, error: nil)
+    
+    if af == nil {
+        println("Error opening audio file with path \(path)")
+        return []
+    }
+    
+    let N_SAMPLES = Int(af.length)
+    
+    var buffer = AVAudioPCMBuffer(PCMFormat: AVAudioFormat(settings: defaultAudioSettings),
+        frameCapacity: AVAudioFrameCount(N_SAMPLES))
+    
+    af.readIntoBuffer(buffer, error: nil)
+    
+    var samples = [Float](count: N_SAMPLES, repeatedValue: 0.0)
+    for var i = 0; i < N_SAMPLES; i++ {
+        samples[i] = buffer.floatChannelData.memory[i]
+    }
+    
+    return samples
+}
