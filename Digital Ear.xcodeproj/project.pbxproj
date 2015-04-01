@@ -20,7 +20,7 @@
 		E1A0A2B51AA8D6810002ED74 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1A0A2B41AA8D6810002ED74 /* Images.xcassets */; };
 		E1A0A2B81AA8D6810002ED74 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E1A0A2B61AA8D6810002ED74 /* LaunchScreen.xib */; };
 		E1A0A2C41AA8D6810002ED74 /* Digital_EarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A0A2C31AA8D6810002ED74 /* Digital_EarTests.swift */; };
-		E1D766A91AC4A10E0013CA44 /* Sounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D766A81AC4A10E0013CA44 /* Sounds.swift */; };
+		E1D766A91AC4A10E0013CA44 /* Sound.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D766A81AC4A10E0013CA44 /* Sound.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,7 +51,7 @@
 		E1A0A2BD1AA8D6810002ED74 /* Digital EarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Digital EarTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1A0A2C21AA8D6810002ED74 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E1A0A2C31AA8D6810002ED74 /* Digital_EarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Digital_EarTests.swift; sourceTree = "<group>"; };
-		E1D766A81AC4A10E0013CA44 /* Sounds.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sounds.swift; sourceTree = "<group>"; };
+		E1D766A81AC4A10E0013CA44 /* Sound.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sound.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,7 +102,7 @@
 				E1A0A2AF1AA8D6810002ED74 /* ViewController.swift */,
 				E146CB661ABDF684003E8ABD /* SoundCollectionViewController.swift */,
 				E1688FCA1ABF38E1007B2BE7 /* SoundViewController.swift */,
-				E1D766A81AC4A10E0013CA44 /* Sounds.swift */,
+				E1D766A81AC4A10E0013CA44 /* Sound.swift */,
 				E189672E1AAB75EF003DF06C /* Ear.swift */,
 				E17972551AABE24500B58925 /* Util.swift */,
 				E1688FCE1ABFAD43007B2BE7 /* Digital_Ear.xcdatamodeld */,
@@ -243,7 +243,7 @@
 				E1A0A2AE1AA8D6810002ED74 /* AppDelegate.swift in Sources */,
 				E1688FD01ABFAD43007B2BE7 /* Digital_Ear.xcdatamodeld in Sources */,
 				E146CB671ABDF684003E8ABD /* SoundCollectionViewController.swift in Sources */,
-				E1D766A91AC4A10E0013CA44 /* Sounds.swift in Sources */,
+				E1D766A91AC4A10E0013CA44 /* Sound.swift in Sources */,
 				E1688FCB1ABF38E1007B2BE7 /* SoundViewController.swift in Sources */,
 				E17972561AABE24600B58925 /* Util.swift in Sources */,
 			);

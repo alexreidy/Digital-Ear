@@ -20,6 +20,8 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     private var onSoundRecognized: (soundName: String) -> ()
     
     private var shouldStopRecording = false
+    
+    private var sounds: [Sound] = []
         
     init(onSoundRecognized: (soundName: String) -> (), sampleRate: Int) {
         self.onSoundRecognized = onSoundRecognized
@@ -153,26 +155,30 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
         if shouldStopRecording { return }
         println("finished recording; processing...")
-        var samples = Ear.adjustForNoiseAndTrimEnds(extractSamplesFromWAV(NSTemporaryDirectory()+"tmp.wav"))
+        var samplesInQuestion = Ear.adjustForNoiseAndTrimEnds(
+            extractSamplesFromWAV(NSTemporaryDirectory()+"tmp.wav"))
         
-        for rec in recordings {
-            let fileName = rec.valueForKey("fileName") as String
-            let name = rec.valueForKey("soundName") as String
-            var samplesB = Ear.adjustForNoiseAndTrimEnds(extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav"))
-            var freqListA = createFrequencyArray(samples, sampleRate: 44100)
-            var freqListB = createFrequencyArray(samplesB, sampleRate: 44100)
-            
-            println("comparing with \(name)")
-            var averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
-            
-            println(averageFreqDiff)
-            
-            if (averageFreqDiff < 0.40) {
-                onSoundRecognized(soundName: name)
+        for sound in sounds {
+            println(sound.name)
+            for rec in sound.recordings {
+                let fileName = rec.valueForKey("fileName") as String
+                var samplesInSavedRecording = Ear.adjustForNoiseAndTrimEnds(
+                    extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav"))
+                
+                let freqListA = createFrequencyArray(samplesInQuestion, sampleRate: DEFAULT_SAMPLE_RATE)
+                let freqListB = createFrequencyArray(samplesInSavedRecording, sampleRate: DEFAULT_SAMPLE_RATE)
+                
+                let averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
+                println(averageFreqDiff)
+                if averageFreqDiff < 0.30 {
+                    onSoundRecognized(soundName: sound.name)
+                    // Sound has been recognized, so we don't analyze any more of its recordings
+                    break
+                }
             }
         }
         
-        listen()
+        listen() // potential call stack issues with this recursion?
     }
     
     private func recordAudio(toPath path: String, seconds: Double) {
@@ -185,7 +191,9 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     func listen() {
         println("going to record")
         shouldStopRecording = false
-        loadRecordingObjects()
+        
+        sounds = getSounds()
+        
         recordAudio(toPath: NSTemporaryDirectory()+"tmp.wav", seconds: 5)
     }
     

@@ -20,26 +20,25 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     @IBOutlet weak var recordButton: UIButton!
     @IBOutlet weak var backButton: UIButton!
     
-    var fileName = "_"
+    var fileName = ""
     
     override func viewDidLoad() {
         recordingsTableView.dataSource = self
-        loadRecordingObjects(withSpecificName: true)
-        titleTextField.text = soundName
+        titleTextField.text = sound.name
     }
     
     func deleteRecButtonTapped(sender: AnyObject) {
-        deleteRecordingWithFilename(String(sender.tag))
+        sound.deleteRecordingWithFileName(String(sender.tag))
         recordingsTableView.reloadData()
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return recordings.count
+        return sound.recordings.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.Value2, reuseIdentifier: nil)
-        let fileName = recordings[indexPath.row].valueForKey("fileName") as? String
+        let fileName = sound.recordings[indexPath.row].valueForKey("fileName") as? String
         cell.detailTextLabel?.text = fileName
         
         let deleteButton = UIButton()
@@ -60,8 +59,8 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     }
     
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
-        addRecordingObjectWithFileName(fileName)
-        saveRecordingObjects()
+        sound.addRecordingWithFileName(fileName)
+        sound.save()
         recordingsTableView.reloadData()
         recordButton.setTitle("Record an instance of this sound",
             forState: UIControlState.Normal)
@@ -70,7 +69,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     }
     
     @IBAction func onRecordButtonTapped(sender: AnyObject) {
-        if soundName == "" {
+        if sound.name == "" {
             println("todo: UI alert: sound name required")
             return
         }
@@ -89,18 +88,10 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         let newSoundName = titleTextField.text
         titleTextField.resignFirstResponder()
         if newSoundName == "" {
-            titleTextField.text = soundName
-            return
+            titleTextField.text = sound.name
+        } else {
+            sound.name = newSoundName
         }
-        for rec in recordings {
-            if let recName = rec.valueForKey("soundName") as? String {
-                if recName == soundName {
-                    rec.setValue(newSoundName, forKey: "soundName")
-                }
-            }
-        }
-        saveRecordingObjects()
-        soundName = newSoundName
     }
     
 }

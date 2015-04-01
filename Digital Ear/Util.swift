@@ -16,11 +16,12 @@ let utilAudioSession = AVAudioSession()
 var utilAudioRecorder: AVAudioRecorder?
 var utilAudioPlayer: AVAudioPlayer?
 
+let DEFAULT_SAMPLE_RATE = 44100
 let defaultAudioSettings: [NSObject : AnyObject] = [
     AVFormatIDKey: kAudioFormatLinearPCM,
     AVLinearPCMIsFloatKey: true,
     AVNumberOfChannelsKey: 1,
-    AVSampleRateKey: 44100,
+    AVSampleRateKey: DEFAULT_SAMPLE_RATE,
 ]
 
 func now() -> Int { return time(nil) }

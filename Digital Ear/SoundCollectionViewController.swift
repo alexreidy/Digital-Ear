@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 
+var sound = Sound(name: "")
+
 class SoundCollectionViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     private var soundNames: [String] = []
@@ -19,15 +21,6 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
         soundTableView.dataSource = self
         soundTableView.delegate = self
         soundNames = getSoundNames()
-    }
-    
-    private func getSoundNames() -> [String] {
-        let names = NSMutableSet()
-        loadRecordingObjects()
-        for rec in recordings {
-            names.addObject(rec.valueForKey("soundName") as String)
-        }
-        return names.allObjects as [String]
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -41,14 +34,14 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        soundName = soundNames[indexPath.row]
-        performSegueWithIdentifier("toSoundViewController", sender: soundName)
+        sound = Sound(name: soundNames[indexPath.row])
+        performSegueWithIdentifier("toSoundViewController", sender: sound.name)
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let s = sender {
+        if let s: AnyObject = sender {
             if s is UIButton {
-                soundName = ""
+                sound.name = ""
             }
         }
     }
