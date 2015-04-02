@@ -102,8 +102,6 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             samplesForChunk[i] = samples[n]
         }
         
-        println(freqArray.count)
-        
         return freqArray
     }
     

@@ -25,15 +25,10 @@ class ViewController: UIViewController {
     var ear: Ear?
     
     @IBAction func unwindToMainView(segue: UIStoryboardSegue) {
-        
-        println("Unwinding to Main VC")
-        
         ear?.listen()
-        
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        println("BETTER TURN OFF RECORDING ETC")
         ear?.stop()
     }
     
@@ -44,7 +39,9 @@ class ViewController: UIViewController {
         ear = Ear(onSoundRecognized: onSoundRecognized, sampleRate: 44100)
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
-            self.ear!.listen()
+            if let e = self.ear {
+                e.listen()
+            }
         })
         
     }

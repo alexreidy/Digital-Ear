@@ -91,6 +91,9 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             titleTextField.text = sound.name
         } else {
             sound.name = newSoundName
+            // Reload in case sounds were merged
+            sound = Sound(name: sound.name)
+            recordingsTableView.reloadData()
         }
     }
     

@@ -40,8 +40,8 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let s: AnyObject = sender {
-            if s is UIButton {
-                sound.name = ""
+            if s is UIButton { // if "Add new" button pressed
+                sound = Sound(name: "")
             }
         }
     }

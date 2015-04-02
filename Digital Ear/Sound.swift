@@ -88,6 +88,7 @@ class Sound {
             return _name
         }
         set(newName) {
+            if _name == newName { return }
             _name = newName
             for rec in recordings {
                 rec.setValue(newName, forKey: "soundName")
@@ -107,6 +108,7 @@ class Sound {
     func addRecordingWithFileName(fileName: String) {
         if let rec = makeRecordingObjectWith(fileName: fileName, soundName: name) {
             recordings.append(rec)
+            save()
         }
     }
     
