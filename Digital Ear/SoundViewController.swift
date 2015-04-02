@@ -24,6 +24,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     
     override func viewDidLoad() {
         recordingsTableView.dataSource = self
+        recordingsTableView.autoresizesSubviews = true
         titleTextField.text = sound.name
     }
     
@@ -46,7 +47,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         deleteButton.titleLabel?.font = UIFont(name: "Avenir Next", size: 10)
         deleteButton.addTarget(self, action: Selector("deleteRecButtonTapped:"),
             forControlEvents: UIControlEvents.TouchUpInside)
-        deleteButton.frame = CGRectMake(80, 10, 80, 30)
+        deleteButton.frame = CGRectMake(recordingsTableView.frame.width - 60, 10, 80, 30)
         deleteButton.setTitleColor(UIColor.orangeColor(),
             forState: UIControlState.Normal)
         cell.contentView.addSubview(deleteButton)
@@ -56,6 +57,12 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         }
         
         return cell
+    }
+    
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator
+        coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        recordingsTableView.reloadData()
     }
     
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
@@ -79,7 +86,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             titleTextField.enabled = false
             backButton.enabled = false
             fileName = String(now())
-            startRecordingAudio(toPath: DOCUMENT_DIR + "\(fileName).wav", delegate: self)
+            startRecordingAudio(toPath: DOCUMENT_DIR + "\(fileName).wav", delegate: self, seconds: 4)
             recordButton.setTitle("Stop recording", forState: UIControlState.Normal)
         }
     }

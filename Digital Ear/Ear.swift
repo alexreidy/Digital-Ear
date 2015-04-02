@@ -157,7 +157,6 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             extractSamplesFromWAV(NSTemporaryDirectory()+"tmp.wav"))
         
         for sound in sounds {
-            println(sound.name)
             for rec in sound.recordings {
                 let fileName = rec.valueForKey("fileName") as String
                 var samplesInSavedRecording = Ear.adjustForNoiseAndTrimEnds(
@@ -168,7 +167,8 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                 
                 let averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
                 println(averageFreqDiff)
-                if averageFreqDiff < 0.30 {
+                
+                if averageFreqDiff < 0.25 {
                     onSoundRecognized(soundName: sound.name)
                     // Sound has been recognized, so we don't analyze any more of its recordings
                     break
@@ -176,7 +176,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             }
         }
         
-        listen() // potential call stack issues with this recursion?
+        listen()
     }
     
     private func recordAudio(toPath path: String, seconds: Double) {
@@ -192,7 +192,13 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         
         sounds = getSounds()
         
-        recordAudio(toPath: NSTemporaryDirectory()+"tmp.wav", seconds: 5)
+        // Notice the indirect tail recursion starting here.
+        // recordAudio() tells recorder to record and call its delegate's didFinishRecording
+        // method (implemented above) when finished, which calls this listen() method again.
+        // I'm only guessing that recorder object calls
+        // self.delegate.audioRecorderDidFinishRecording() as its tail call.
+        // Otherwise there might theoretically be a call stack mem leak.
+        recordAudio(toPath: NSTemporaryDirectory()+"tmp.wav", seconds: 7)
     }
     
     func stop() {
