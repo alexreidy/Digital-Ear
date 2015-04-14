@@ -35,7 +35,7 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
         let deleteButton = UIButton()
         deleteButton.setTitle("delete", forState: UIControlState.Normal)
         deleteButton.titleLabel?.font = UIFont(name: "Avenir Next", size: 10)
-        deleteButton.addTarget(self, action: Selector("deleteRecButtonTapped:"),
+        deleteButton.addTarget(self, action: Selector("deleteSoundButtonTapped:"),
             forControlEvents: UIControlEvents.TouchUpInside)
         deleteButton.frame = CGRectMake(soundTableView.frame.width - 60, 10, 80, 30)
         deleteButton.setTitleColor(UIColor.orangeColor(),
@@ -52,11 +52,24 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
         performSegueWithIdentifier("toSoundViewController", sender: sound.name)
     }
     
-    func deleteRecButtonTapped(sender: AnyObject) {
-        let i = sender.tag
-        Sound(name: soundNames[i]).delete()
-        soundNames.removeAtIndex(i)
+    var row = 0
+    func deleteSound(action: UIAlertAction!) -> Void {
+        Sound(name: soundNames[row]).delete()
+        soundNames.removeAtIndex(row)
         soundTableView.reloadData()
+    }
+    
+    func deleteSoundButtonTapped(sender: AnyObject) {
+        row = sender.tag
+        let alert = UIAlertController(title: nil,
+            message: "Are you sure you want to delete this sound?",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
+        let deleteAction = UIAlertAction(title: "Yes, delete", style: UIAlertActionStyle.Default,
+            handler: deleteSound)
+        alert.addAction(cancelAction)
+        alert.addAction(deleteAction)
+        presentViewController(alert, animated: true, completion: nil)
     }
     
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator

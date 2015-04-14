@@ -27,10 +27,23 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         recordingsTableView.autoresizesSubviews = true
         titleTextField.text = sound.name
     }
+
+    func deleteRecording(action: UIAlertAction!) -> Void {
+        sound.deleteRecordingWithFileName(fileName)
+        recordingsTableView.reloadData()
+    }
     
     func deleteRecButtonTapped(sender: AnyObject) {
-        sound.deleteRecordingWithFileName(String(sender.tag))
-        recordingsTableView.reloadData()
+        fileName = String(sender.tag)
+        let alert = UIAlertController(title: nil,
+            message: "Are you sure you want to delete this recording?",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
+        let deleteAction = UIAlertAction(title: "Yes, delete", style: UIAlertActionStyle.Default,
+            handler: deleteRecording)
+        alert.addAction(cancelAction)
+        alert.addAction(deleteAction)
+        presentViewController(alert, animated: true, completion: nil)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
