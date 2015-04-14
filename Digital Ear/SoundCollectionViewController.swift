@@ -54,7 +54,6 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
     
     func deleteRecButtonTapped(sender: AnyObject) {
         let i = sender.tag
-        println("deleting\(i)")
         Sound(name: soundNames[i]).delete()
         soundNames.removeAtIndex(i)
         soundTableView.reloadData()

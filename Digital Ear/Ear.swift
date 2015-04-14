@@ -15,7 +15,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     
     private var recorder: AVAudioRecorder!
     
-    let settings = defaultAudioSettings
+    var settings = defaultAudioSettings
     
     private var onSoundRecognized: (soundName: String) -> ()
     
@@ -31,7 +31,6 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         audioSession.setActive(true, error: nil)
         
         settings[AVSampleRateKey] = sampleRate
-        
     }
     
     class func adjustForNoiseAndTrimEnds(samples: [Float]) -> [Float] {
@@ -158,7 +157,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         
         for sound in sounds {
             for rec in sound.recordings {
-                let fileName = rec.valueForKey("fileName") as String
+                let fileName = rec.valueForKey("fileName") as! String
                 var samplesInSavedRecording = Ear.adjustForNoiseAndTrimEnds(
                     extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav"))
                 
@@ -168,7 +167,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                 let averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
                 println(averageFreqDiff)
                 
-                if averageFreqDiff < 0.25 {
+                if averageFreqDiff < 0.3 {
                     onSoundRecognized(soundName: sound.name)
                     // Sound has been recognized, so we don't analyze any more of its recordings
                     break

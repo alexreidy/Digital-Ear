@@ -75,7 +75,20 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         backButton.enabled = true
     }
     
+    func changeSoundNameTo(newSoundName: String) {
+        titleTextField.resignFirstResponder()
+        if newSoundName == "" {
+            titleTextField.text = sound.name
+        } else if newSoundName != sound.name {
+            sound.name = newSoundName
+            // Reload in case sounds were merged
+            sound = Sound(name: sound.name)
+            recordingsTableView.reloadData()
+        }
+    }
+    
     @IBAction func onRecordButtonTapped(sender: AnyObject) {
+        changeSoundNameTo(titleTextField.text)
         if sound.name == "" {
             println("todo: UI alert: sound name required")
             return
@@ -92,16 +105,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     }
     
     @IBAction func doneEditing(sender: AnyObject) {
-        let newSoundName = titleTextField.text
-        titleTextField.resignFirstResponder()
-        if newSoundName == "" {
-            titleTextField.text = sound.name
-        } else {
-            sound.name = newSoundName
-            // Reload in case sounds were merged
-            sound = Sound(name: sound.name)
-            recordingsTableView.reloadData()
-        }
+        changeSoundNameTo(titleTextField.text)
     }
     
 }

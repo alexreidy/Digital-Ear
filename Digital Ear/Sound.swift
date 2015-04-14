@@ -16,10 +16,10 @@ func loadRecordingObjects(soundName: String?) -> [NSManagedObject] {
     var recordings: [NSManagedObject] = []
     let fetchRequest = NSFetchRequest(entityName: "Recording")
     if let context = managedContext {
-        let allRecs = context.executeFetchRequest(fetchRequest, error: nil) as [NSManagedObject]
+        let allRecs = context.executeFetchRequest(fetchRequest, error: nil) as! [NSManagedObject]
         if let sn = soundName {
             for rec in allRecs {
-                if rec.valueForKey("soundName") as String == sn {
+                if rec.valueForKey("soundName") as! String == sn {
                     recordings.append(rec)
                 }
             }
@@ -35,9 +35,9 @@ func getSoundNames() -> [String] {
     let names = NSMutableSet()
     let recordings = loadRecordingObjects(nil)
     for rec in recordings {
-        names.addObject(rec.valueForKey("soundName") as String)
+        names.addObject(rec.valueForKey("soundName") as! String)
     }
-    return names.allObjects as [String]
+    return names.allObjects as! [String]
 }
 
 func makeRecordingObjectWith(#fileName: String, #soundName: String) -> NSManagedObject? {
@@ -99,9 +99,7 @@ class Sound {
 
     init(name: String) {
         _name = name
-        if name == "" {
-            return
-        }
+        if name == "" { return }
         recordings = loadRecordingObjects(name)
     }
     
@@ -116,7 +114,7 @@ class Sound {
         var i = 0
         for ; i < recordings.count; i++ {
             let rec = recordings[i]
-            if rec.valueForKey("fileName") as String == fileName {
+            if rec.valueForKey("fileName") as! String == fileName {
                 deleteRecording(rec, save: true)
                 break
             }

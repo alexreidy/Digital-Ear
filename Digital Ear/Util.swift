@@ -62,11 +62,7 @@ func playAudio(filePath: String) {
         player.volume = 1
         if player.play() {
             println("playing")
-        } else {
-            println("failed to play")
         }
-    } else {
-        println("player is nil")
     }
 }
 
