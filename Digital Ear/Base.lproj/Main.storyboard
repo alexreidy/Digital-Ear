@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D131" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -25,7 +25,7 @@
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Ug-sz-iWk">
                                 <rect key="frame" x="535" y="28" width="51" height="31"/>
                             </switch>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PzB-ex-zfc">
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PzB-ex-zfc">
                                 <rect key="frame" x="211" y="74" width="178" height="30"/>
                                 <state key="normal" title="Manage Sound Collection">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -34,28 +34,28 @@
                                     <segue destination="yOv-7i-ntP" kind="show" id="t5C-Ou-lZY"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="It sounds like nothing!" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T1m-hX-5wf">
-                                <rect key="frame" x="215" y="289" width="169" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="i3C-yd-MnE">
+                                <rect key="frame" x="16" y="112" width="568" height="468"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="PzB-ex-zfc" firstAttribute="top" secondItem="UZv-Ir-YYq" secondAttribute="bottom" constant="8" id="71w-Tx-yCK"/>
                             <constraint firstItem="UZv-Ir-YYq" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="86V-fX-XUH"/>
                             <constraint firstItem="PzB-ex-zfc" firstAttribute="top" secondItem="UZv-Ir-YYq" secondAttribute="bottom" constant="8" id="9YH-y9-A8L"/>
-                            <constraint firstAttribute="centerX" secondItem="T1m-hX-5wf" secondAttribute="centerX" id="Ko4-mX-kbD"/>
+                            <constraint firstItem="i3C-yd-MnE" firstAttribute="top" secondItem="PzB-ex-zfc" secondAttribute="bottom" constant="8" id="HdJ-6B-CyI"/>
+                            <constraint firstItem="i3C-yd-MnE" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="IXO-HY-eOi"/>
                             <constraint firstAttribute="centerX" secondItem="PzB-ex-zfc" secondAttribute="centerX" id="Lii-uJ-ucd"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="i3C-yd-MnE" secondAttribute="bottom" constant="20" id="TQS-Ar-e9b"/>
                             <constraint firstItem="UZv-Ir-YYq" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" id="UNE-mM-cKR"/>
                             <constraint firstItem="3Ug-sz-iWk" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="bqE-Iw-XDw"/>
-                            <constraint firstAttribute="centerY" secondItem="T1m-hX-5wf" secondAttribute="centerY" id="xP6-qy-D2a"/>
+                            <constraint firstItem="i3C-yd-MnE" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="fzy-0h-rEb"/>
                             <constraint firstItem="3Ug-sz-iWk" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="8" id="xe2-Rt-WFR"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="soundLabel" destination="T1m-hX-5wf" id="J8c-ir-wgd"/>
+                        <outlet property="tableForRecognizedSounds" destination="i3C-yd-MnE" id="uwj-vr-5Yz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

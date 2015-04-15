@@ -90,3 +90,24 @@ func extractSamplesFromWAV(path: String) -> [Float] {
     
     return samples
 }
+
+func formatTimeBetween(startTime: Int, endTime: Int) -> String {
+    if endTime < startTime { return "error" }
+    let secondsElapsed = endTime - startTime
+    if secondsElapsed >= 3600 {
+        let hours = secondsElapsed / 3600
+        let seconds = secondsElapsed % 3600
+        let minutes = seconds / 60
+        return "\(hours)h \(minutes)m"
+    }
+    if secondsElapsed >= 60 {
+        let minutesElapsed: Int = secondsElapsed / 60
+        let seconds: Int = secondsElapsed % 60
+        return "\(minutesElapsed)m \(seconds)s"
+    }
+    return "\(secondsElapsed)s"
+}
+
+func formatTimeSince(time: Int) -> String {
+    return formatTimeBetween(time, now())
+}
