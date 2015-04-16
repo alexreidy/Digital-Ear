@@ -31,7 +31,14 @@ func sign(x: Float) -> Int {
     return 1
 }
 
-func startRecordingAudio(toPath path: String, delegate: AVAudioRecorderDelegate? = nil, seconds: Double = MAX_REC_DURATION) {
+func average(data: [Float]) -> Float {
+    var sum: Float = 0
+    for x in data { sum += x }
+    return sum / Float(data.count)
+}
+
+func startRecordingAudio(toPath path: String, delegate: AVAudioRecorderDelegate? = nil,
+    seconds: Double = MAX_REC_DURATION) {
     // if utilAudioRecorder == nil ??? don't want to record while recording...
     utilAudioRecorder = AVAudioRecorder(URL: NSURL(fileURLWithPath: path),
         settings: defaultAudioSettings, error: nil)
@@ -94,16 +101,21 @@ func extractSamplesFromWAV(path: String) -> [Float] {
 func formatTimeBetween(startTime: Int, endTime: Int) -> String {
     if endTime < startTime { return "error" }
     let secondsElapsed = endTime - startTime
+    if secondsElapsed >= 3600 * 24 {
+        let days = secondsElapsed / (3600 * 24)
+        let hours = (secondsElapsed % (3600 * 24)) / 3600
+        return "\(days)d, \(hours)h"
+    }
     if secondsElapsed >= 3600 {
         let hours = secondsElapsed / 3600
         let seconds = secondsElapsed % 3600
         let minutes = seconds / 60
-        return "\(hours)h \(minutes)m"
+        return "\(hours)h, \(minutes)m"
     }
     if secondsElapsed >= 60 {
         let minutesElapsed: Int = secondsElapsed / 60
         let seconds: Int = secondsElapsed % 60
-        return "\(minutesElapsed)m \(seconds)s"
+        return "\(minutesElapsed)m, \(seconds)s"
     }
     return "\(secondsElapsed)s"
 }

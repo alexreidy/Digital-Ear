@@ -11,6 +11,9 @@ import AVFoundation
 
 class ViewController: UIViewController, UITableViewDataSource {
     
+    var camera = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
+    var flashing = false
+    
     var recognizedSounds: [(timestamp: Int, soundName: String)] = []
     
     @IBOutlet weak var tableForRecognizedSounds: UITableView!
@@ -19,10 +22,24 @@ class ViewController: UIViewController, UITableViewDataSource {
         println("Sounds like \(sname)")
         recognizedSounds.append((timestamp: now(), soundName: sname))
         tableForRecognizedSounds.reloadData()
-        AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+            self.flash(0.4, times: 5)
+        })
+        // AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
     }
     
     var ear: Ear?
+    
+    @IBAction func onButtonToggled(sender: AnyObject) {
+        if sender is UISwitch {
+            let s: UISwitch = sender as! UISwitch
+            if s.on {
+                ear?.listen()
+            } else {
+                ear?.stop()
+            }
+        }
+    }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return recognizedSounds.count
@@ -45,6 +62,31 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         ear?.stop()
+        camera.lockForConfiguration(nil)
+        camera.torchMode = AVCaptureTorchMode.Off
+        camera.unlockForConfiguration()
+    }
+    
+    func setFlashLevel(level: Float) {
+        camera.lockForConfiguration(nil)
+        if level == 0 {
+            camera.torchMode = AVCaptureTorchMode.Off
+        } else {
+            camera.setTorchModeOnWithLevel(level, error: nil)
+        }
+        camera.unlockForConfiguration()
+    }
+    
+    func flash(interval: Double, times: Int) {
+        // interval is in seconds
+        if flashing { return }
+        flashing = true
+        var on = true
+        for var i = 0; i < times * 2; i++, on = !on {
+            if on { setFlashLevel(0.9) } else { setFlashLevel(0) }
+            NSThread.sleepForTimeInterval(interval)
+        }
+        flashing = false
     }
     
     override func viewDidLoad() {

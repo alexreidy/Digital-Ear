@@ -78,6 +78,24 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         return Float(cycles) / seconds
     }
     
+    private func range(data: [Float]) -> Float {
+        var max = -MAXFLOAT, min = MAXFLOAT
+        for x in data {
+            if x > max { max = x }
+            if x < min { min = x }
+        }
+        return max - min
+    }
+    
+    private func meanDeviation(data: [Float]) -> Float {
+        var deviationSum: Float = 0
+        let mean = average(data)
+        for x in data {
+            deviationSum += abs(x - mean)
+        }
+        return deviationSum / Float(data.count)
+    }
+    
     private func createFrequencyArray(samples: [Float], sampleRate: Int, freqChunksPerSec: Int = 20) -> [Float] {
         // TODO - redo with slices for performance
         
@@ -162,12 +180,19 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                     extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav"))
                 
                 let freqListA = createFrequencyArray(samplesInQuestion, sampleRate: DEFAULT_SAMPLE_RATE)
-                let freqListB = createFrequencyArray(samplesInSavedRecording, sampleRate: DEFAULT_SAMPLE_RATE)
+                let freqListB = createFrequencyArray(samplesInSavedRecording,
+                    sampleRate: DEFAULT_SAMPLE_RATE)
+                
+                var maxRelativeFreqDiffForRecognition: Float = 0.25
+                println("\(sound.name) meandeviation = \(meanDeviation(freqListB))")
+                if meanDeviation(freqListB) < 250 {
+                    maxRelativeFreqDiffForRecognition = 0.1
+                }
                 
                 let averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
                 println(averageFreqDiff)
                 
-                if averageFreqDiff < 0.3 {
+                if averageFreqDiff < maxRelativeFreqDiffForRecognition {
                     onSoundRecognized(soundName: sound.name)
                     // Sound has been recognized, so we don't analyze any more of its recordings
                     break
