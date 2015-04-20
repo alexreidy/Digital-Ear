@@ -12,6 +12,7 @@
 		E1688FCB1ABF38E1007B2BE7 /* SoundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1688FCA1ABF38E1007B2BE7 /* SoundViewController.swift */; };
 		E1688FCD1ABFACED007B2BE7 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1688FCC1ABFACED007B2BE7 /* CoreData.framework */; };
 		E1688FD01ABFAD43007B2BE7 /* Digital_Ear.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E1688FCE1ABFAD43007B2BE7 /* Digital_Ear.xcdatamodeld */; };
+		E16D2ED61AE55A93004A40C3 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16D2ED51AE55A93004A40C3 /* WaveformView.swift */; };
 		E17972561AABE24600B58925 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = E17972551AABE24500B58925 /* Util.swift */; };
 		E189672F1AAB75EF003DF06C /* Ear.swift in Sources */ = {isa = PBXBuildFile; fileRef = E189672E1AAB75EF003DF06C /* Ear.swift */; };
 		E1A0A2AE1AA8D6810002ED74 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A0A2AD1AA8D6810002ED74 /* AppDelegate.swift */; };
@@ -39,6 +40,7 @@
 		E1688FCA1ABF38E1007B2BE7 /* SoundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundViewController.swift; sourceTree = "<group>"; };
 		E1688FCC1ABFACED007B2BE7 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		E1688FCF1ABFAD43007B2BE7 /* Digital_Ear.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Digital_Ear.xcdatamodel; sourceTree = "<group>"; };
+		E16D2ED51AE55A93004A40C3 /* WaveformView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		E17972551AABE24500B58925 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		E189672E1AAB75EF003DF06C /* Ear.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ear.swift; sourceTree = "<group>"; };
 		E1A0A2A81AA8D6810002ED74 /* Digital Ear.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Digital Ear.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -102,6 +104,7 @@
 				E1A0A2AF1AA8D6810002ED74 /* ViewController.swift */,
 				E146CB661ABDF684003E8ABD /* SoundCollectionViewController.swift */,
 				E1688FCA1ABF38E1007B2BE7 /* SoundViewController.swift */,
+				E16D2ED51AE55A93004A40C3 /* WaveformView.swift */,
 				E1D766A81AC4A10E0013CA44 /* Sound.swift */,
 				E189672E1AAB75EF003DF06C /* Ear.swift */,
 				E17972551AABE24500B58925 /* Util.swift */,
@@ -240,6 +243,7 @@
 			files = (
 				E189672F1AAB75EF003DF06C /* Ear.swift in Sources */,
 				E1A0A2B01AA8D6810002ED74 /* ViewController.swift in Sources */,
+				E16D2ED61AE55A93004A40C3 /* WaveformView.swift in Sources */,
 				E1A0A2AE1AA8D6810002ED74 /* AppDelegate.swift in Sources */,
 				E1688FD01ABFAD43007B2BE7 /* Digital_Ear.xcdatamodeld in Sources */,
 				E146CB671ABDF684003E8ABD /* SoundCollectionViewController.swift in Sources */,

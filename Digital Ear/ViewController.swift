@@ -11,7 +11,7 @@ import AVFoundation
 
 class ViewController: UIViewController, UITableViewDataSource {
     
-    var camera = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
+    var camera: AVCaptureDevice? = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
     var flashing = false
     
     var recognizedSounds: [(timestamp: Int, soundName: String)] = []
@@ -62,19 +62,19 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         ear?.stop()
-        camera.lockForConfiguration(nil)
-        camera.torchMode = AVCaptureTorchMode.Off
-        camera.unlockForConfiguration()
+        camera?.lockForConfiguration(nil)
+        camera?.torchMode = AVCaptureTorchMode.Off
+        camera?.unlockForConfiguration()
     }
     
     func setFlashLevel(level: Float) {
-        camera.lockForConfiguration(nil)
+        camera?.lockForConfiguration(nil)
         if level == 0 {
-            camera.torchMode = AVCaptureTorchMode.Off
+            camera?.torchMode = AVCaptureTorchMode.Off
         } else {
-            camera.setTorchModeOnWithLevel(level, error: nil)
+            camera?.setTorchModeOnWithLevel(level, error: nil)
         }
-        camera.unlockForConfiguration()
+        camera?.unlockForConfiguration()
     }
     
     func flash(interval: Double, times: Int) {

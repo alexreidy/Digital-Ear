@@ -53,7 +53,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.Value2, reuseIdentifier: nil)
         let fileName = sound.recordings[indexPath.row].valueForKey("fileName") as? String
-        cell.detailTextLabel?.text = fileName
+        // cell.detailTextLabel?.text = fileName
         
         let deleteButton = UIButton()
         deleteButton.setTitle("delete", forState: UIControlState.Normal)
@@ -64,6 +64,9 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         deleteButton.setTitleColor(UIColor.orangeColor(),
             forState: UIControlState.Normal)
         cell.contentView.addSubview(deleteButton)
+        
+        let waveformViewRect = CGRectMake(5, 5, deleteButton.frame.minX, cell.frame.height - 10)
+        cell.contentView.addSubview(WaveformView(frame: waveformViewRect, samples: extractSamplesFromWAV(DOCUMENT_DIR+fileName!+".wav")))
         
         if let fn = fileName {
             deleteButton.tag = fn.toInt()!

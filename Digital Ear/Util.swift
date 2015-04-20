@@ -31,6 +31,16 @@ func sign(x: Float) -> Int {
     return 1
 }
 
+func max(nums: [Float]) -> Float {
+    var max: Float = -MAXFLOAT
+    for n in nums {
+        if n > max {
+            max = n
+        }
+    }
+    return max
+}
+
 func average(data: [Float]) -> Float {
     var sum: Float = 0
     for x in data { sum += x }

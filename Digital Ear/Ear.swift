@@ -42,7 +42,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         var noiseAdjustedSamples = samples
         var firstNonzeroAmplitudeIndex = 0, lastNonzeroAmplitudeIndex = 0
         for var i = 0; i < samples.count; i++ {
-            if abs(samples[i]) < 0.001 {
+            if abs(samples[i]) < 0.005 {
                 noiseAdjustedSamples[i] = 0.0
             } else { // => amp is nontrivial
                 lastNonzeroAmplitudeIndex = i
@@ -89,7 +89,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     
     private func meanDeviation(data: [Float]) -> Float {
         var deviationSum: Float = 0
-        let mean = average(data)
+        let mean = average(data) // zero may also work
         for x in data {
             deviationSum += abs(x - mean)
         }
@@ -184,7 +184,6 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                     sampleRate: DEFAULT_SAMPLE_RATE)
                 
                 var maxRelativeFreqDiffForRecognition: Float = 0.25
-                println("\(sound.name) meandeviation = \(meanDeviation(freqListB))")
                 if meanDeviation(freqListB) < 250 {
                     maxRelativeFreqDiffForRecognition = 0.1
                 }
