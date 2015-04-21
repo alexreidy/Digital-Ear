@@ -21,6 +21,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     @IBOutlet weak var backButton: UIButton!
     
     var fileName = ""
+    var timeRecordingStarted: Double = 0
     
     override func viewDidLoad() {
         recordingsTableView.dataSource = self
@@ -30,8 +31,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
 
     func deleteRecording(action: UIAlertAction!) -> Void {
         sound.deleteRecordingWithFileName(fileName)
-        waveformViewWithFilename.removeValueForKey(fileName)
-        println(waveformViewWithFilename.count)
+        waveformViewCache.removeValueForKey(fileName)
         recordingsTableView.reloadData()
     }
     
@@ -52,7 +52,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         return sound.recordings.count
     }
     
-    var waveformViewWithFilename: [String : WaveformView] = Dictionary()
+    var waveformViewCache: [String : WaveformView] = Dictionary()
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.Value2, reuseIdentifier: nil)
@@ -73,14 +73,14 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         cell.contentView.addSubview(deleteButton)
         
         var view: WaveformView? = nil
-        let index = waveformViewWithFilename.indexForKey(fileName!)
+        let index = waveformViewCache.indexForKey(fileName!)
         if index == nil {
             let waveformViewRect = CGRectMake(5, 5, deleteButton.frame.minX, cell.frame.height - 10)
             view = WaveformView(frame: waveformViewRect, samples:
                 extractSamplesFromWAV(DOCUMENT_DIR+fileName!+".wav"))
-            waveformViewWithFilename[fileName!] = view
+            waveformViewCache[fileName!] = view
         } else {
-            view = waveformViewWithFilename[index!].1
+            view = waveformViewCache[index!].1
         }
         cell.contentView.addSubview(view!)
 
@@ -95,7 +95,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator
         coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-        waveformViewWithFilename = Dictionary()
+        waveformViewCache = Dictionary()
         recordingsTableView.reloadData()
     }
     
@@ -133,12 +133,14 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             presentViewController(alert, animated: true, completion: nil)
             return
         }
-        if recording() {
+        
+        if recording() && timestampDouble() - timeRecordingStarted >= 0.4 {
             stopRecordingAudio()
-        } else {
+        } else if !recording() {
             titleTextField.enabled = false
             backButton.enabled = false
             fileName = String(now())
+            timeRecordingStarted = timestampDouble()
             startRecordingAudio(toPath: DOCUMENT_DIR + "\(fileName).wav", delegate: self, seconds: 4)
             recordButton.setTitle("Stop recording", forState: UIControlState.Normal)
         }

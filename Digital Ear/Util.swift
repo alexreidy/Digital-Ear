@@ -24,6 +24,7 @@ let defaultAudioSettings: [NSObject : AnyObject] = [
     AVSampleRateKey: DEFAULT_SAMPLE_RATE,
 ]
 
+func timestampDouble() -> Double { return NSDate().timeIntervalSince1970 }
 func now() -> Int { return time(nil) }
 
 func sign(x: Float) -> Int {
