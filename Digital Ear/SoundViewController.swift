@@ -30,6 +30,8 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
 
     func deleteRecording(action: UIAlertAction!) -> Void {
         sound.deleteRecordingWithFileName(fileName)
+        waveformViewWithFilename.removeValueForKey(fileName)
+        println(waveformViewWithFilename.count)
         recordingsTableView.reloadData()
     }
     

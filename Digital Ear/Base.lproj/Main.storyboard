@@ -24,6 +24,10 @@
                             </label>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Ug-sz-iWk">
                                 <rect key="frame" x="535" y="28" width="51" height="31"/>
+                                <color key="backgroundColor" red="0.83547264669999999" green="0.95860636229999996" blue="0.87892287930000002" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="onTintColor" red="0.040849393939999999" green="0.70594759029999998" blue="0.92832623110000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="thumbTintColor" red="0.83547264669999999" green="0.95860636229999996" blue="0.87892287930000002" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
                                     <action selector="onButtonToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="iF7-dF-Kpz"/>
                                 </connections>
@@ -42,7 +46,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="0.83547264669999999" green="0.95860636229999996" blue="0.87892287930000002" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="PzB-ex-zfc" firstAttribute="top" secondItem="UZv-Ir-YYq" secondAttribute="bottom" constant="8" id="71w-Tx-yCK"/>
                             <constraint firstItem="UZv-Ir-YYq" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="86V-fX-XUH"/>
