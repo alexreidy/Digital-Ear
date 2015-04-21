@@ -29,11 +29,13 @@ class WaveformView: UIView {
         
         var SAMPLES_PER_BAR: Int = samples.count / N_BARS
         
-        CGContextSetRGBFillColor(ctx, 0.0, 1.0, 0.0, 1.0)
-        for var i = 0; i < N_BARS; i++ {
-            
-            let avgAmplitude: Float = average(Array(samples[i * SAMPLES_PER_BAR..<(i+1) * SAMPLES_PER_BAR]))
-            let r = CGRectMake(CGFloat(Float(i) * dx), CGFloat(self.frame.height/2), CGFloat(dx),
+        CGContextSetRGBFillColor(ctx, 48.0/255.0, 48.0/255.0, 48.0/255.0, 1.0)
+        CGContextFillRect(ctx, CGRectMake(0, 0, self.frame.width, self.frame.height))
+        
+        CGContextSetRGBFillColor(ctx, 31.0/255.0, 239.0/255.0, 156.0/255.0, 1.0)
+        for var k = 0; k < N_BARS; k++ {
+            let avgAmplitude: Float = average(Array(samples[k * SAMPLES_PER_BAR..<(k+1) * SAMPLES_PER_BAR]))
+            let r = CGRectMake(CGFloat(Float(k) * dx), CGFloat(self.frame.height/2), CGFloat(dx),
                 CGFloat(avgAmplitude * 5 * Float(self.frame.height)))
             CGContextFillRect(ctx, r)
         }

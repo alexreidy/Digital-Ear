@@ -50,10 +50,14 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         return sound.recordings.count
     }
     
+    var waveformViewWithFilename: [String : WaveformView] = Dictionary()
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.Value2, reuseIdentifier: nil)
         let fileName = sound.recordings[indexPath.row].valueForKey("fileName") as? String
-        // cell.detailTextLabel?.text = fileName
+        if fileName == nil {
+            return cell
+        }
         
         let deleteButton = UIButton()
         deleteButton.setTitle("delete", forState: UIControlState.Normal)
@@ -65,8 +69,18 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             forState: UIControlState.Normal)
         cell.contentView.addSubview(deleteButton)
         
-        let waveformViewRect = CGRectMake(5, 5, deleteButton.frame.minX, cell.frame.height - 10)
-        cell.contentView.addSubview(WaveformView(frame: waveformViewRect, samples: extractSamplesFromWAV(DOCUMENT_DIR+fileName!+".wav")))
+        var view: WaveformView? = nil
+        let index = waveformViewWithFilename.indexForKey(fileName!)
+        if index == nil {
+            let waveformViewRect = CGRectMake(5, 5, deleteButton.frame.minX, cell.frame.height - 10)
+            view = WaveformView(frame: waveformViewRect, samples:
+                extractSamplesFromWAV(DOCUMENT_DIR+fileName!+".wav"))
+            waveformViewWithFilename[fileName!] = view
+        } else {
+            view = waveformViewWithFilename[index!].1
+        }
+        cell.contentView.addSubview(view!)
+
         
         if let fn = fileName {
             deleteButton.tag = fn.toInt()!
@@ -78,6 +92,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator
         coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        waveformViewWithFilename = Dictionary()
         recordingsTableView.reloadData()
     }
     
