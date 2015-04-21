@@ -36,23 +36,30 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     class func adjustForNoiseAndTrimEnds(samples: [Float]) -> [Float] {
         // At low amplitudes, the fluctuation across "zero" due to noise
         // is actually quite pronounced, resulting in high frequencies when
-        // it's quiet, so we just change all of the negligibly small amplitudes to zero.
+        // it's quiet, so we basically change all of the negligibly small amplitudes to zero.
         // Additionally, we remove any leading or trailing zeros before returning.
         
         var noiseAdjustedSamples = samples
         var firstNonzeroAmplitudeIndex = 0, lastNonzeroAmplitudeIndex = 0
-        for var i = 0; i < samples.count; i++ {
-            if abs(samples[i]) < 0.005 {
-                noiseAdjustedSamples[i] = 0.0
-            } else { // => amp is nontrivial
-                lastNonzeroAmplitudeIndex = i
-                if firstNonzeroAmplitudeIndex == 0 {
-                    firstNonzeroAmplitudeIndex = i
+        
+        let SAMPLES_PER_CHUNK = DEFAULT_SAMPLE_RATE / 10
+        
+        for var k = 0; k < samples.count / SAMPLES_PER_CHUNK; k++ {
+            let chunk: [Float] = Array(samples[k * SAMPLES_PER_CHUNK ..< (k+1) * SAMPLES_PER_CHUNK])
+            if abs(average(chunk)) < 0.00001 {
+                for var i = k * SAMPLES_PER_CHUNK; i < (k+1) * SAMPLES_PER_CHUNK; i++ {
+                    noiseAdjustedSamples[i] = 0.0
                 }
+                continue
+            }
+            lastNonzeroAmplitudeIndex = (k+1) * SAMPLES_PER_CHUNK
+            if firstNonzeroAmplitudeIndex == 0 {
+                firstNonzeroAmplitudeIndex = k * SAMPLES_PER_CHUNK
             }
         }
+        
         return Array(noiseAdjustedSamples[
-            firstNonzeroAmplitudeIndex..<lastNonzeroAmplitudeIndex+1])
+            firstNonzeroAmplitudeIndex..<lastNonzeroAmplitudeIndex])
     }
     
     class func countCyclesIn(samples: [Float]) -> Int {
@@ -97,7 +104,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     }
     
     private func createFrequencyArray(samples: [Float], sampleRate: Int, freqChunksPerSec: Int = 20) -> [Float] {
-        // TODO - redo with slices for performance
+        // TODO - refactor with slices (?)
         
         let samplesPerChunk = sampleRate / freqChunksPerSec
         if samples.count < samplesPerChunk {
