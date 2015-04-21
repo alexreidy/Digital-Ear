@@ -61,11 +61,12 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         
         let deleteButton = UIButton()
         deleteButton.setTitle("delete", forState: UIControlState.Normal)
-        deleteButton.titleLabel?.font = UIFont(name: "Avenir Next", size: 10)
+        deleteButton.titleLabel?.font = UIFont(name: "Avenir Next", size: 11)
         deleteButton.addTarget(self, action: Selector("deleteRecButtonTapped:"),
             forControlEvents: UIControlEvents.TouchUpInside)
-        deleteButton.frame = CGRectMake(recordingsTableView.frame.width - 60, 10, 80, 30)
-        deleteButton.setTitleColor(UIColor.orangeColor(),
+        deleteButton.frame = CGRectMake(recordingsTableView.frame.width - 46, 5, 50, cell.frame.height - 10)
+        deleteButton.backgroundColor = UIColor(red: 216.0/255.0, green: 216.0/255.0, blue: 216.0/255.0, alpha: 1.0)
+        deleteButton.setTitleColor(UIColor(red: 48.0/255.0, green: 48.0/255.0, blue: 48.0/255.0, alpha: 1.0),
             forState: UIControlState.Normal)
         cell.contentView.addSubview(deleteButton)
         
@@ -121,7 +122,13 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     @IBAction func onRecordButtonTapped(sender: AnyObject) {
         changeSoundNameTo(titleTextField.text)
         if sound.name == "" {
-            println("todo: UI alert: sound name required")
+            let alert = UIAlertController(title: nil,
+                message: "Sound name required",
+                preferredStyle: UIAlertControllerStyle.Alert)
+            let okAction = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default,
+                handler: nil)
+            alert.addAction(okAction)
+            presentViewController(alert, animated: true, completion: nil)
             return
         }
         if recording() {
