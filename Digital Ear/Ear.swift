@@ -45,8 +45,8 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         let SAMPLES_PER_CHUNK = DEFAULT_SAMPLE_RATE / 10
         
         for var k = 0; k < samples.count / SAMPLES_PER_CHUNK; k++ {
-            let chunk: [Float] = Array(samples[k * SAMPLES_PER_CHUNK ..< (k+1) * SAMPLES_PER_CHUNK])
-            if abs(average(chunk)) < 0.00001 {
+            let chunk: [Float] = Array(noiseAdjustedSamples[k * SAMPLES_PER_CHUNK ..< (k+1) * SAMPLES_PER_CHUNK])
+            if abs(average(chunk)) < 0.0000001 {
                 for var i = k * SAMPLES_PER_CHUNK; i < (k+1) * SAMPLES_PER_CHUNK; i++ {
                     noiseAdjustedSamples[i] = 0.0
                 }
@@ -96,14 +96,14 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     
     private func meanDeviation(data: [Float]) -> Float {
         var deviationSum: Float = 0
-        let mean = average(data) // zero may also work
+        let mean = average(data)
         for x in data {
             deviationSum += abs(x - mean)
         }
         return deviationSum / Float(data.count)
     }
     
-    private func createFrequencyArray(samples: [Float], sampleRate: Int, freqChunksPerSec: Int = 20) -> [Float] {
+    private func createFrequencyArray(samples: [Float], sampleRate: Int, freqChunksPerSec: Int = 50) -> [Float] {
         // TODO - refactor with slices (?)
         
         let samplesPerChunk = sampleRate / freqChunksPerSec
@@ -190,7 +190,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                 let freqListB = createFrequencyArray(samplesInSavedRecording,
                     sampleRate: DEFAULT_SAMPLE_RATE)
                 
-                var maxRelativeFreqDiffForRecognition: Float = 0.25
+                var maxRelativeFreqDiffForRecognition: Float = 0.2
                 if meanDeviation(freqListB) < 250 {
                     maxRelativeFreqDiffForRecognition = 0.1
                 }

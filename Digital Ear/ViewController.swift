@@ -62,19 +62,39 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         ear?.stop()
-        camera?.lockForConfiguration(nil)
-        camera?.torchMode = AVCaptureTorchMode.Off
-        camera?.unlockForConfiguration()
+        if let cam = camera {
+            cam.lockForConfiguration(nil)
+            if cam.isTorchModeSupported(AVCaptureTorchMode.Off) {
+                cam.torchMode = AVCaptureTorchMode.Off
+            }
+            cam.unlockForConfiguration()
+        }
     }
     
     func setFlashLevel(level: Float) {
-        camera?.lockForConfiguration(nil)
-        if level == 0 {
-            camera?.torchMode = AVCaptureTorchMode.Off
-        } else {
-            camera?.setTorchModeOnWithLevel(level, error: nil)
+        if let cam = camera {
+            cam.lockForConfiguration(nil)
+            if cam.hasTorch && cam.isTorchModeSupported(AVCaptureTorchMode.Off) &&
+                cam.isTorchModeSupported(AVCaptureTorchMode.On) {
+                if cam.torchAvailable {
+                    if level == 0 {
+                        cam.torchMode = AVCaptureTorchMode.Off
+                    } else {
+                        cam.setTorchModeOnWithLevel(level, error: nil)
+                    }
+                }
+            } else if cam.hasFlash && cam.isFlashModeSupported(AVCaptureFlashMode.Off) &&
+                cam.isFlashModeSupported(AVCaptureFlashMode.On) {
+                if cam.flashAvailable {
+                    if level == 0 {
+                        cam.flashMode = AVCaptureFlashMode.Off
+                    } else {
+                        cam.flashMode = AVCaptureFlashMode.On
+                    }
+                }
+            }
+            cam.unlockForConfiguration()
         }
-        camera?.unlockForConfiguration()
     }
     
     func flash(interval: Double, times: Int) {
