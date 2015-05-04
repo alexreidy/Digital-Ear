@@ -134,3 +134,10 @@ func formatTimeBetween(startTime: Int, endTime: Int) -> String {
 func formatTimeSince(time: Int) -> String {
     return formatTimeBetween(time, now())
 }
+
+func canAddSound() -> Bool {
+    if getSoundNames().count < 1 {
+        return true
+    }
+    return NSUserDefaults().boolForKey("unlimited")
+}

@@ -18,10 +18,13 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     var settings = defaultAudioSettings
     
     private var onSoundRecognized: (soundName: String) -> ()
+    var soundsRecognizedLastAnalysis = Set<String>()
     
     private var shouldStopRecording = false
     
     private var sounds: [Sound] = []
+    
+    private let secondsToRecord: Double = 7
         
     init(onSoundRecognized: (soundName: String) -> (), sampleRate: Int) {
         self.onSoundRecognized = onSoundRecognized
@@ -174,11 +177,25 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         return minAvgRelativeFreqDiff
     }
     
+    var prevSamplesInQuestion: [Float] = []
+    
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
         if shouldStopRecording { return }
         println("finished recording; processing...")
-        var samplesInQuestion = Ear.adjustForNoiseAndTrimEnds(
+        
+        let sampleRate = settings[AVSampleRateKey] as! Int
+        var samplesInQuestion = prevSamplesInQuestion
+        if samplesInQuestion.count > 5 * sampleRate {
+            // At most, samplesInQuestion is (5 + secondsToRecord) * sampleRate samples long
+            let startIndex = samplesInQuestion.count - 5 * sampleRate
+            samplesInQuestion = Array(samplesInQuestion[startIndex..<samplesInQuestion.count])
+        }
+        samplesInQuestion += Ear.adjustForNoiseAndTrimEnds(
             extractSamplesFromWAV(NSTemporaryDirectory()+"tmp.wav"))
+        
+        prevSamplesInQuestion = samplesInQuestion
+        
+        var soundsRecognized = Set<String>()
         
         for sound in sounds {
             for rec in sound.recordings {
@@ -192,21 +209,26 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                 
                 var maxRelativeFreqDiffForRecognition: Float = 0.2
                 if meanDeviation(freqListB) < 250 {
-                    maxRelativeFreqDiffForRecognition = 0.1
+                    maxRelativeFreqDiffForRecognition = 0.08
                 }
                 
                 let averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
                 println(averageFreqDiff)
                 
                 if averageFreqDiff < maxRelativeFreqDiffForRecognition {
-                    onSoundRecognized(soundName: sound.name)
+                    if !soundsRecognizedLastAnalysis.contains(sound.name) {
+                        onSoundRecognized(soundName: sound.name)
+                        soundsRecognized.insert(sound.name)
+                    }
                     // Sound has been recognized, so we don't analyze any more of its recordings
                     break
                 }
             }
         }
         
-        listen()
+        soundsRecognizedLastAnalysis = soundsRecognized
+        
+        return listen()
     }
     
     private func recordAudio(toPath path: String, seconds: Double) {
@@ -228,7 +250,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         // I'm only guessing that recorder object calls
         // self.delegate.audioRecorderDidFinishRecording() as its tail call.
         // Otherwise there might theoretically be a call stack mem leak.
-        recordAudio(toPath: NSTemporaryDirectory()+"tmp.wav", seconds: 7)
+        return recordAudio(toPath: NSTemporaryDirectory()+"tmp.wav", seconds: secondsToRecord)
     }
     
     func stop() {

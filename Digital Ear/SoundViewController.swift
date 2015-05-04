@@ -8,10 +8,10 @@
 
 import Foundation
 import AVFoundation
-import CoreData
+import StoreKit
 import UIKit
 
-class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableViewDataSource {
+class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableViewDataSource, SKProductsRequestDelegate, SKPaymentTransactionObserver {
     
     @IBOutlet weak var titleTextField: UITextField!
 
@@ -23,10 +23,49 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     var fileName = ""
     var timeRecordingStarted: Double = 0
     
+    let productIDs: Set<NSObject> = ["unlimited_sounds_1"]
+    
+    func purchaseUnlimitedSounds(action: UIAlertAction!) {
+        if SKPaymentQueue.canMakePayments() {
+            SKPaymentQueue.defaultQueue().addTransactionObserver(self)
+            var productsRequest = SKProductsRequest(productIdentifiers: productIDs)
+            productsRequest.delegate = self
+            productsRequest.start()
+        } else {
+            println("Can't make payments")
+            let alert = UIAlertController(title: nil,
+                message: "Unable to make payments",
+                preferredStyle: UIAlertControllerStyle.Alert)
+            let okAction = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default,
+                handler: nil)
+            alert.addAction(okAction)
+            presentViewController(alert, animated: true, completion: nil)
+        }
+    }
+    
     override func viewDidLoad() {
         recordingsTableView.dataSource = self
         recordingsTableView.autoresizesSubviews = true
         titleTextField.text = sound.name
+        
+        if sound.name == "" && !canAddSound() {
+            recordButton.enabled = false
+            titleTextField.enabled = false
+        }
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        if sound.name == "" && !canAddSound() {
+            let alert = UIAlertController(title: nil,
+                message: "With the Unlimited Sounds upgrade, you can create any number of distinct sounds in order to be notified whenever one is recognized. Please only make this purchase after ensuring that Digital Ear works well in your environment by testing with the free sound slot.",
+                preferredStyle: UIAlertControllerStyle.Alert)
+            let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
+            let okAction = UIAlertAction(title: "Purchase", style: UIAlertActionStyle.Default,
+                handler: purchaseUnlimitedSounds)
+            alert.addAction(cancelAction)
+            alert.addAction(okAction)
+            presentViewController(alert, animated: true, completion: nil)
+        }
     }
 
     func deleteRecording(action: UIAlertAction!) -> Void {
@@ -83,7 +122,6 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             view = waveformViewCache[index!].1
         }
         cell.contentView.addSubview(view!)
-
         
         if let fn = fileName {
             deleteButton.tag = fn.toInt()!
@@ -148,6 +186,40 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     
     @IBAction func doneEditing(sender: AnyObject) {
         changeSoundNameTo(titleTextField.text)
+    }
+    
+    func productsRequest(request: SKProductsRequest!, didReceiveResponse response: SKProductsResponse!) {
+        let products: [SKProduct] = response.products as! [SKProduct]
+        if products.count > 0 {
+            if let product = products.first {
+                println(product.localizedTitle)
+                if product.productIdentifier == productIDs.first {
+                    SKPaymentQueue.defaultQueue().addPayment(SKPayment(product: product))
+                }
+            }
+        }
+    }
+    
+    func paymentQueue(queue: SKPaymentQueue!, updatedTransactions transactions: [AnyObject]!) {
+        for transaction in transactions as! [SKPaymentTransaction] {
+            switch transaction.transactionState {
+            case SKPaymentTransactionState.Purchased:
+                println("Purchased")
+                NSUserDefaults().setBool(true, forKey: "unlimited")
+                SKPaymentQueue.defaultQueue().finishTransaction(transaction)
+                break
+            case SKPaymentTransactionState.Purchasing:
+                println("Purchasing...")
+                break
+            case SKPaymentTransactionState.Failed:
+                println("Failed to purchase")
+                SKPaymentQueue.defaultQueue().finishTransaction(transaction)
+                break
+            default:
+                println(transaction.transactionState)
+            }
+            
+        }
     }
     
 }

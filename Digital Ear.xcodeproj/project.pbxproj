@@ -15,6 +15,7 @@
 		E16D2ED61AE55A93004A40C3 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E16D2ED51AE55A93004A40C3 /* WaveformView.swift */; };
 		E17972561AABE24600B58925 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = E17972551AABE24500B58925 /* Util.swift */; };
 		E189672F1AAB75EF003DF06C /* Ear.swift in Sources */ = {isa = PBXBuildFile; fileRef = E189672E1AAB75EF003DF06C /* Ear.swift */; };
+		E18E4C901AF6C88100C2C44C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E18E4C8F1AF6C88100C2C44C /* StoreKit.framework */; };
 		E1A0A2AE1AA8D6810002ED74 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A0A2AD1AA8D6810002ED74 /* AppDelegate.swift */; };
 		E1A0A2B01AA8D6810002ED74 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1A0A2AF1AA8D6810002ED74 /* ViewController.swift */; };
 		E1A0A2B31AA8D6810002ED74 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1A0A2B11AA8D6810002ED74 /* Main.storyboard */; };
@@ -43,6 +44,7 @@
 		E16D2ED51AE55A93004A40C3 /* WaveformView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		E17972551AABE24500B58925 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		E189672E1AAB75EF003DF06C /* Ear.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ear.swift; sourceTree = "<group>"; };
+		E18E4C8F1AF6C88100C2C44C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		E1A0A2A81AA8D6810002ED74 /* Digital Ear.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Digital Ear.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1A0A2AC1AA8D6810002ED74 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E1A0A2AD1AA8D6810002ED74 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -61,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E18E4C901AF6C88100C2C44C /* StoreKit.framework in Frameworks */,
 				E1688FCD1ABFACED007B2BE7 /* CoreData.framework in Frameworks */,
 				E12B981C1AAA0C5E0032BC94 /* AVFoundation.framework in Frameworks */,
 			);
@@ -79,6 +82,7 @@
 		E1A0A29F1AA8D6810002ED74 = {
 			isa = PBXGroup;
 			children = (
+				E18E4C8F1AF6C88100C2C44C /* StoreKit.framework */,
 				E1688FCC1ABFACED007B2BE7 /* CoreData.framework */,
 				E12B981B1AAA0C5E0032BC94 /* AVFoundation.framework */,
 				E1A0A2AA1AA8D6810002ED74 /* Digital Ear */,

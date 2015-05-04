@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import StoreKit
 
 var sound = Sound(name: "")
 
