@@ -43,14 +43,18 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         }
     }
     
+    func setUI(#enabled: Bool) {
+        recordButton.enabled = enabled
+        titleTextField.enabled = enabled
+    }
+    
     override func viewDidLoad() {
         recordingsTableView.dataSource = self
         recordingsTableView.autoresizesSubviews = true
         titleTextField.text = sound.name
         
         if sound.name == "" && !canAddSound() {
-            recordButton.enabled = false
-            titleTextField.enabled = false
+            setUI(enabled: false)
         }
     }
     
@@ -206,6 +210,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             case SKPaymentTransactionState.Purchased:
                 println("Purchased")
                 NSUserDefaults().setBool(true, forKey: "unlimited")
+                setUI(enabled: true)
                 SKPaymentQueue.defaultQueue().finishTransaction(transaction)
                 break
             case SKPaymentTransactionState.Purchasing:
@@ -220,6 +225,10 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             }
             
         }
+    }
+    
+    deinit {
+        SKPaymentQueue.defaultQueue().removeTransactionObserver(self)
     }
     
 }
