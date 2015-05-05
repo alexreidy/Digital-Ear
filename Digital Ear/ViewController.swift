@@ -115,8 +115,6 @@ class ViewController: UIViewController, UITableViewDataSource {
         
         // NSUserDefaults().setBool(false, forKey: "unlimited") // for testing
         
-        println(canAddSound())
-                        
         ear = Ear(onSoundRecognized: onSoundRecognized, sampleRate: DEFAULT_SAMPLE_RATE)
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
