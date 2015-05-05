@@ -113,7 +113,8 @@ class ViewController: UIViewController, UITableViewDataSource {
         // Do any additional setup after loading the view, typically from a nib.
         tableForRecognizedSounds.dataSource = self
         
-        NSUserDefaults().setBool(false, forKey: "unlimited")
+        // NSUserDefaults().setBool(false, forKey: "unlimited") // for testing
+        
         println(canAddSound())
                         
         ear = Ear(onSoundRecognized: onSoundRecognized, sampleRate: DEFAULT_SAMPLE_RATE)
