@@ -45,11 +45,11 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         var noiseAdjustedSamples = samples
         var firstNonzeroAmplitudeIndex = 0, lastNonzeroAmplitudeIndex = 0
         
-        let SAMPLES_PER_CHUNK = DEFAULT_SAMPLE_RATE / 10
+        let SAMPLES_PER_CHUNK = DEFAULT_SAMPLE_RATE / 4
         
         for var k = 0; k < samples.count / SAMPLES_PER_CHUNK; k++ {
             let chunk: [Float] = Array(noiseAdjustedSamples[k * SAMPLES_PER_CHUNK ..< (k+1) * SAMPLES_PER_CHUNK])
-            if abs(average(chunk)) < 0.0000001 {
+            if abs(average(chunk, absolute: true)) < 0.0001 {
                 for var i = k * SAMPLES_PER_CHUNK; i < (k+1) * SAMPLES_PER_CHUNK; i++ {
                     noiseAdjustedSamples[i] = 0.0
                 }

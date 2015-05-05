@@ -9,6 +9,15 @@
 import UIKit
 import AVFoundation
 
+let soundsForScreenshot: [(timestamp: Int, soundName: String)] = [
+    (now()-60*65*2-26, "the doorbell"),
+    (now()-60*65*2-20, "the door opening"),
+    (now()-60*12-3, "the microwave"),
+    (now()-60*1-3, "the sink"),
+    (now()-42, "the oven"),
+    (now()-27, "the smoke detector!"),
+]
+
 class ViewController: UIViewController, UITableViewDataSource {
     
     var camera: AVCaptureDevice? = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
@@ -113,7 +122,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         // Do any additional setup after loading the view, typically from a nib.
         tableForRecognizedSounds.dataSource = self
         
-        // NSUserDefaults().setBool(false, forKey: "unlimited") // for testing
+        // NSUserDefaults().setBool(true, forKey: "unlimited") // for testing! Comment out for production.
         
         ear = Ear(onSoundRecognized: onSoundRecognized, sampleRate: DEFAULT_SAMPLE_RATE)
         

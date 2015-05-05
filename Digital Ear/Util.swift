@@ -42,9 +42,16 @@ func max(nums: [Float]) -> Float {
     return max
 }
 
-func average(data: [Float]) -> Float {
+func average(data: [Float], absolute: Bool = false) -> Float {
+    // If absolute, return the average absolute distance from zero
     var sum: Float = 0
-    for x in data { sum += x }
+    for x in data {
+        if absolute {
+            sum += abs(x)
+        } else {
+            sum += x
+        }
+    }
     return sum / Float(data.count)
 }
 
