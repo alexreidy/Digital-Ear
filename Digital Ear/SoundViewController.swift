@@ -24,13 +24,13 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     var timeRecordingStarted: Double = 0
     
     let productIDs: Set<NSObject> = ["unlimited_sounds_1"]
+    var unlimitedSoundsProduct: SKProduct?
     
     func purchaseUnlimitedSounds(action: UIAlertAction!) {
         if SKPaymentQueue.canMakePayments() {
-            SKPaymentQueue.defaultQueue().addTransactionObserver(self)
-            var productsRequest = SKProductsRequest(productIdentifiers: productIDs)
-            productsRequest.delegate = self
-            productsRequest.start()
+            if let product = unlimitedSoundsProduct {
+                SKPaymentQueue.defaultQueue().addPayment(SKPayment(product: product))
+            }
         } else {
             println("Can't make payments")
             let alert = UIAlertController(title: nil,
@@ -55,21 +55,32 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         
         if sound.name == "" && !canAddSound() {
             setUI(enabled: false)
+            SKPaymentQueue.defaultQueue().addTransactionObserver(self)
+            var productsRequest = SKProductsRequest(productIdentifiers: productIDs)
+            productsRequest.delegate = self
+            productsRequest.start()
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
-        if sound.name == "" && !canAddSound() {
-            let alert = UIAlertController(title: nil,
-                message: "With the Unlimited Sounds upgrade, you can create any number of distinct sounds in order to be notified whenever one is recognized. Please only make this purchase after ensuring that Digital Ear works well in your environment by testing with the free sound slot.",
-                preferredStyle: UIAlertControllerStyle.Alert)
-            let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
-            let okAction = UIAlertAction(title: "Purchase", style: UIAlertActionStyle.Default,
-                handler: purchaseUnlimitedSounds)
-            alert.addAction(cancelAction)
-            alert.addAction(okAction)
-            presentViewController(alert, animated: true, completion: nil)
-        }
+    func restorePurchases(action: UIAlertAction!) {
+        SKPaymentQueue.defaultQueue().restoreCompletedTransactions()
+    }
+
+    func showPopupForIAP() {
+        if unlimitedSoundsProduct == nil { return }
+        let price: String = unlimitedSoundsProduct!.localizedPrice()
+        let alert = UIAlertController(title: nil,
+            message: "With the Unlimited Sounds upgrade (\(price)), you can create any number of distinct sounds in order to be notified whenever one is recognized. Please only make this purchase after ensuring that Digital Ear works well in your environment by testing with the free sound slot. Thanks for your business!",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
+        let restoreAction = UIAlertAction(title: "I already own this", style: UIAlertActionStyle.Default, handler: restorePurchases)
+        let purchaseAction = UIAlertAction(title: "Purchase", style: UIAlertActionStyle.Default,
+            handler: purchaseUnlimitedSounds)
+        alert.addAction(cancelAction)
+        alert.addAction(purchaseAction)
+        alert.addAction(restoreAction)
+        
+        presentViewController(alert, animated: true, completion: nil)
     }
 
     func deleteRecording(action: UIAlertAction!) -> Void {
@@ -198,10 +209,16 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             if let product = products.first {
                 println(product.localizedTitle)
                 if product.productIdentifier == productIDs.first {
-                    SKPaymentQueue.defaultQueue().addPayment(SKPayment(product: product))
+                    unlimitedSoundsProduct = product
+                    showPopupForIAP()
                 }
             }
         }
+    }
+    
+    func unlockFeatures() {
+        NSUserDefaults().setBool(true, forKey: "unlimited")
+        setUI(enabled: true)
     }
     
     func paymentQueue(queue: SKPaymentQueue!, updatedTransactions transactions: [AnyObject]!) {
@@ -209,8 +226,12 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             switch transaction.transactionState {
             case SKPaymentTransactionState.Purchased:
                 println("Purchased")
-                NSUserDefaults().setBool(true, forKey: "unlimited")
-                setUI(enabled: true)
+                unlockFeatures()
+                SKPaymentQueue.defaultQueue().finishTransaction(transaction)
+                break
+            case SKPaymentTransactionState.Restored:
+                println("Restored")
+                unlockFeatures()
                 SKPaymentQueue.defaultQueue().finishTransaction(transaction)
                 break
             case SKPaymentTransactionState.Purchasing:
@@ -225,6 +246,24 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
             }
             
         }
+    }
+    
+    func featuresUnlocked() -> Bool {
+        return titleTextField.enabled && recordButton.enabled
+    }
+    
+    func paymentQueueRestoreCompletedTransactionsFinished(queue: SKPaymentQueue!) {
+        if featuresUnlocked() { return } // => successfully restored
+        func backToPopup(action: UIAlertAction!) {
+            showPopupForIAP()
+        }
+        let alert = UIAlertController(title: nil,
+            message: "It looks like you have not yet purchased Unlimited Sounds",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        let okAction = UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default,
+            handler: backToPopup)
+        alert.addAction(okAction)
+        presentViewController(alert, animated: true, completion: nil)
     }
     
     deinit {

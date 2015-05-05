@@ -207,15 +207,15 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                 let freqListB = createFrequencyArray(samplesInSavedRecording,
                     sampleRate: DEFAULT_SAMPLE_RATE)
                 
-                var maxRelativeFreqDiffForRecognition: Float = 0.2
+                var maxRelativeFreqDiffForRecognition: Float = 0.16
                 if meanDeviation(freqListB) < 250 {
                     maxRelativeFreqDiffForRecognition = 0.08
                 }
                 
                 let averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
-                println(averageFreqDiff)
+                println(sound.name + " \(averageFreqDiff)")
                 
-                if averageFreqDiff < maxRelativeFreqDiffForRecognition {
+                if averageFreqDiff <= maxRelativeFreqDiffForRecognition {
                     if !soundsRecognizedLastAnalysis.contains(sound.name) {
                         onSoundRecognized(soundName: sound.name)
                         soundsRecognized.insert(sound.name)

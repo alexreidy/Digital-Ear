@@ -141,3 +141,15 @@ func canAddSound() -> Bool {
     }
     return NSUserDefaults().boolForKey("unlimited")
 }
+
+import StoreKit
+extension SKProduct {
+    // Thanks to Ben Dodson
+    func localizedPrice() -> String {
+        let formatter = NSNumberFormatter()
+        formatter.numberStyle = .CurrencyStyle
+        formatter.locale = self.priceLocale
+        return formatter.stringFromNumber(self.price)!
+    }
+    
+}
