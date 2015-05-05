@@ -152,21 +152,12 @@
                         <rect key="frame" x="0.0" y="64" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xqt-Ei-Kbh">
-                                <rect key="frame" x="16" y="28" width="35" height="30"/>
-                                <state key="normal" title="Back">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="hkl-uv-7sB" kind="unwind" unwindAction="unwindToMainView:" id="yhl-hA-Vah"/>
-                                </connections>
-                            </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="fsz-6h-Tnx">
-                                <rect key="frame" x="16" y="66" width="568" height="526"/>
+                                <rect key="frame" x="16" y="49" width="568" height="543"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hma-Ub-d78">
-                                <rect key="frame" x="476" y="28" width="108" height="30"/>
+                                <rect key="frame" x="476" y="16" width="108" height="30"/>
                                 <state key="normal" title="Add new sound">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -174,13 +165,26 @@
                                     <segue destination="G1j-pt-wi0" kind="show" identifier="toSoundViewController" id="fxw-49-A6W"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xqt-Ei-Kbh">
+                                <rect key="frame" x="16" y="16" width="35" height="30"/>
+                                <state key="normal" title="Back">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="hkl-uv-7sB" kind="unwind" unwindAction="unwindToMainView:" id="yhl-hA-Vah"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="xqt-Ei-Kbh" firstAttribute="top" secondItem="q5H-ys-1t7" secondAttribute="bottom" constant="8" id="F61-45-Bn8"/>
+                            <constraint firstItem="fsz-6h-Tnx" firstAttribute="top" secondItem="hma-Ub-d78" secondAttribute="bottom" constant="3" id="K9s-4f-yVI"/>
                             <constraint firstItem="fsz-6h-Tnx" firstAttribute="trailing" secondItem="OrI-lR-ue8" secondAttribute="trailingMargin" id="Si5-nD-2tC"/>
+                            <constraint firstItem="xqt-Ei-Kbh" firstAttribute="top" secondItem="OrI-lR-ue8" secondAttribute="topMargin" constant="16" id="TaR-iE-IYh"/>
+                            <constraint firstItem="xqt-Ei-Kbh" firstAttribute="leading" secondItem="OrI-lR-ue8" secondAttribute="leadingMargin" id="TzB-gN-UiT"/>
                             <constraint firstItem="fsz-6h-Tnx" firstAttribute="top" secondItem="xqt-Ei-Kbh" secondAttribute="bottom" constant="8" id="UbQ-Bx-SSJ"/>
                             <constraint firstItem="YTG-Cm-wXf" firstAttribute="top" secondItem="fsz-6h-Tnx" secondAttribute="bottom" constant="8" id="WkV-71-jti"/>
+                            <constraint firstItem="hma-Ub-d78" firstAttribute="top" secondItem="OrI-lR-ue8" secondAttribute="topMargin" constant="16" id="c1V-oi-Jln"/>
                             <constraint firstItem="hma-Ub-d78" firstAttribute="trailing" secondItem="OrI-lR-ue8" secondAttribute="trailingMargin" id="d2d-b3-bJG"/>
                             <constraint firstItem="xqt-Ei-Kbh" firstAttribute="leading" secondItem="OrI-lR-ue8" secondAttribute="leadingMargin" id="fwV-Vd-VCC"/>
                             <constraint firstItem="xqt-Ei-Kbh" firstAttribute="leading" secondItem="OrI-lR-ue8" secondAttribute="leadingMargin" id="heg-vg-IL0"/>
@@ -190,7 +194,12 @@
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
+                                <exclude reference="F61-45-Bn8"/>
+                                <exclude reference="fwV-Vd-VCC"/>
+                                <exclude reference="heg-vg-IL0"/>
                                 <exclude reference="skO-XC-s5K"/>
+                                <exclude reference="UbQ-Bx-SSJ"/>
+                                <exclude reference="t2p-ig-uwF"/>
                             </mask>
                         </variation>
                     </view>
