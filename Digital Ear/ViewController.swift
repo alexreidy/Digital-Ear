@@ -9,6 +9,7 @@
 import UIKit
 import AVFoundation
 
+/*
 let soundsForScreenshot: [(timestamp: Int, soundName: String)] = [
     (now()-60*65*2-26, "the doorbell"),
     (now()-60*65*2-20, "the door opening"),
@@ -16,7 +17,7 @@ let soundsForScreenshot: [(timestamp: Int, soundName: String)] = [
     (now()-60*1-3, "the sink"),
     (now()-42, "the oven"),
     (now()-27, "the smoke detector!"),
-]
+]*/
 
 class ViewController: UIViewController, UITableViewDataSource {
     
