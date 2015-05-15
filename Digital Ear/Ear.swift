@@ -196,6 +196,8 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         samplesInQuestion += Ear.adjustForNoiseAndTrimEnds(
             extractSamplesFromWAV(NSTemporaryDirectory()+tempWav))
         
+        var freqListA = createFrequencyArray(samplesInQuestion, sampleRate: DEFAULT_SAMPLE_RATE)
+        
         prevSamplesInQuestion = samplesInQuestion
         
         var soundsRecognized = Set<String>()
@@ -204,7 +206,6 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             for rec in sound.recordings {
                 let fileName = rec.valueForKey("fileName") as! String
                 
-                var freqListA = createFrequencyArray(samplesInQuestion, sampleRate: DEFAULT_SAMPLE_RATE)
                 var freqListB: [Float] = []
                 if let freqList = freqListForWAV[fileName] {
                     freqListB = freqList
@@ -282,6 +283,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             // no longer exists, delete dict entry.
             for fn in freqListForWAV.keys {
                 if !contains(fileNames, fn) {
+                    println("removing freqList from cache")
                     freqListForWAV.removeValueForKey(fn)
                 }
             }
