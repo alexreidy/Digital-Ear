@@ -265,14 +265,24 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         if shouldTryFreqCacheUpdate {
             sounds = getSounds()
             println("trying freq cache update")
+            var fileNames: [String] = []
             for sound in sounds {
                 for rec in sound.recordings {
                     let fileName = rec.valueForKey("fileName") as! String
+                    fileNames.append(fileName)
                     if !contains(freqListForWAV.keys, fileName) {
+                        println("adding freqList to cache")
                         freqListForWAV[fileName] = createFrequencyArray(Ear.adjustForNoiseAndTrimEnds(
                             extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav")),
                             sampleRate: DEFAULT_SAMPLE_RATE)
                     }
+                }
+            }
+            // If there's a freqList in the cache with a fileName that
+            // no longer exists, delete dict entry.
+            for fn in freqListForWAV.keys {
+                if !contains(fileNames, fn) {
+                    freqListForWAV.removeValueForKey(fn)
                 }
             }
         }
