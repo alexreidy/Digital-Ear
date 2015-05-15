@@ -23,8 +23,11 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     private var shouldStopRecording = false
     
     private var sounds: [Sound] = []
+    private var freqListForWAV = [String : [Float]]() // cache
     
     private let secondsToRecord: Double = 7
+    
+    private let tempWav = "tmp.wav"
         
     init(onSoundRecognized: (soundName: String) -> (), sampleRate: Int) {
         self.onSoundRecognized = onSoundRecognized
@@ -191,7 +194,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             samplesInQuestion = Array(samplesInQuestion[startIndex..<samplesInQuestion.count])
         }
         samplesInQuestion += Ear.adjustForNoiseAndTrimEnds(
-            extractSamplesFromWAV(NSTemporaryDirectory()+"tmp.wav"))
+            extractSamplesFromWAV(NSTemporaryDirectory()+tempWav))
         
         prevSamplesInQuestion = samplesInQuestion
         
@@ -200,12 +203,17 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         for sound in sounds {
             for rec in sound.recordings {
                 let fileName = rec.valueForKey("fileName") as! String
-                var samplesInSavedRecording = Ear.adjustForNoiseAndTrimEnds(
-                    extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav"))
                 
-                let freqListA = createFrequencyArray(samplesInQuestion, sampleRate: DEFAULT_SAMPLE_RATE)
-                let freqListB = createFrequencyArray(samplesInSavedRecording,
-                    sampleRate: DEFAULT_SAMPLE_RATE)
+                var freqListA = createFrequencyArray(samplesInQuestion, sampleRate: DEFAULT_SAMPLE_RATE)
+                var freqListB: [Float] = []
+                if let freqList = freqListForWAV[fileName] {
+                    freqListB = freqList
+                } else {
+                    var samplesInSavedRecording = Ear.adjustForNoiseAndTrimEnds(
+                        extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav"))
+                    freqListB = createFrequencyArray(samplesInSavedRecording,
+                        sampleRate: DEFAULT_SAMPLE_RATE)
+                }
                 
                 var maxRelativeFreqDiffForRecognition: Float = 0.16
                 if meanDeviation(freqListB) < 250 {
@@ -238,11 +246,36 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         recorder.recordForDuration(seconds)
     }
     
+    private var lastFreqCacheUpdateTime = now() - 60
+    private var shouldTryFreqCacheUpdate: Bool {
+        get {
+            let time = now()
+            if time - lastFreqCacheUpdateTime >= 30 {
+                lastFreqCacheUpdateTime = time
+                return true
+            }
+            return false
+        }
+    }
+    
     func listen() {
-        println("going to record")
+        println("going to listen")
         shouldStopRecording = false
         
-        sounds = getSounds()
+        if shouldTryFreqCacheUpdate {
+            sounds = getSounds()
+            println("trying freq cache update")
+            for sound in sounds {
+                for rec in sound.recordings {
+                    let fileName = rec.valueForKey("fileName") as! String
+                    if !contains(freqListForWAV.keys, fileName) {
+                        freqListForWAV[fileName] = createFrequencyArray(Ear.adjustForNoiseAndTrimEnds(
+                            extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav")),
+                            sampleRate: DEFAULT_SAMPLE_RATE)
+                    }
+                }
+            }
+        }
         
         // Notice the indirect tail recursion starting here.
         // recordAudio() tells recorder to record and call its delegate's didFinishRecording
@@ -250,11 +283,11 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         // I'm only guessing that recorder object calls
         // self.delegate.audioRecorderDidFinishRecording() as its tail call.
         // Otherwise there might theoretically be a call stack mem leak.
-        return recordAudio(toPath: NSTemporaryDirectory()+"tmp.wav", seconds: secondsToRecord)
+        return recordAudio(toPath: NSTemporaryDirectory()+tempWav, seconds: secondsToRecord)
     }
     
     func stop() {
-        println("done recording")
+        println("stopped listening")
         shouldStopRecording = true
         stopRecordingAudio()
     }

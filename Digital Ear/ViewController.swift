@@ -123,7 +123,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         // Do any additional setup after loading the view, typically from a nib.
         tableForRecognizedSounds.dataSource = self
         
-        // NSUserDefaults().setBool(true, forKey: "unlimited") // for testing! Comment out for production.
+        NSUserDefaults().setBool(true, forKey: "unlimited") // for testing! Comment out for production.
         
         ear = Ear(onSoundRecognized: onSoundRecognized, sampleRate: DEFAULT_SAMPLE_RATE)
         
@@ -147,6 +147,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+        
     }
 
 
