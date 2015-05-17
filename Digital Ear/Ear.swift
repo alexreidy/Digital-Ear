@@ -17,7 +17,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     
     var settings = defaultAudioSettings
     
-    private var onSoundRecognized: (soundName: String) -> ()
+    private var onSoundRecognized: (sound: Sound) -> ()
     var soundsRecognizedLastAnalysis = Set<String>()
     
     private var shouldStopRecording = false
@@ -29,7 +29,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     
     private let tempWav = "tmp.wav"
         
-    init(onSoundRecognized: (soundName: String) -> (), sampleRate: Int) {
+    init(onSoundRecognized: (sound: Sound) -> (), sampleRate: Int) {
         self.onSoundRecognized = onSoundRecognized
         
         audioSession.setCategory(AVAudioSessionCategoryRecord, error: nil)
@@ -226,7 +226,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                 
                 if averageFreqDiff <= maxRelativeFreqDiffForRecognition {
                     if !soundsRecognizedLastAnalysis.contains(sound.name) {
-                        onSoundRecognized(soundName: sound.name)
+                        onSoundRecognized(sound: sound)
                         soundsRecognized.insert(sound.name)
                     }
                     // Sound has been recognized, so we don't analyze any more of its recordings

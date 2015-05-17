@@ -26,6 +26,21 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     let productIDs: Set<NSObject> = ["unlimited_sounds_1"]
     var unlimitedSoundsProduct: SKProduct?
     
+    @IBOutlet weak var flashSwitch: UISwitch!
+    @IBAction func flashToggled(sender: AnyObject) {
+        if sender is UISwitch {
+            let s = sender as! UISwitch
+            sound.flashWhenRecognized = s.on
+        }
+    }
+    @IBOutlet weak var vibrateSwitch: UISwitch!
+    @IBAction func vibrateToggled(sender: AnyObject) {
+        if sender is UISwitch {
+            let s = sender as! UISwitch
+            sound.vibrateWhenRecognized = s.on
+        }
+    }
+    
     func purchaseUnlimitedSounds(action: UIAlertAction!) {
         if SKPaymentQueue.canMakePayments() {
             if let product = unlimitedSoundsProduct {
@@ -52,6 +67,11 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         recordingsTableView.dataSource = self
         recordingsTableView.autoresizesSubviews = true
         titleTextField.text = sound.name
+        
+        if sound.name != "" {
+            flashSwitch.on = sound.flashWhenRecognized
+            vibrateSwitch.on = sound.vibrateWhenRecognized
+        }
         
         if sound.name == "" && !canAddSound() {
             setUI(enabled: false)

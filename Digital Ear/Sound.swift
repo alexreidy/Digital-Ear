@@ -103,6 +103,26 @@ class Sound {
         recordings = loadRecordingObjects(name)
     }
     
+    var flashWhenRecognized: Bool {
+        get {
+            return NSUserDefaults().boolForKey(name + "_SHOULD_FLASH")
+        }
+        set(should) {
+            NSUserDefaults().setBool(should, forKey:
+                name + "_SHOULD_FLASH")
+        }
+    }
+    
+    var vibrateWhenRecognized: Bool {
+        get {
+            return NSUserDefaults().boolForKey(name + "_SHOULD_VIBRATE")
+        }
+        set(should) {
+            NSUserDefaults().setBool(should, forKey:
+                name + "_SHOULD_VIBRATE")
+        }
+    }
+    
     func addRecordingWithFileName(fileName: String) {
         if let rec = makeRecordingObjectWith(fileName: fileName, soundName: name) {
             recordings.append(rec)

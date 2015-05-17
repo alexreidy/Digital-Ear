@@ -28,13 +28,24 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     @IBOutlet weak var tableForRecognizedSounds: UITableView!
     
-    func onSoundRecognized(sname: String) {
-        println("Sounds like \(sname)")
-        recognizedSounds.append((timestamp: now(), soundName: sname))
+    func onSoundRecognized(sound: Sound) {
+        println("Sounds like \(sound.name)")
+        let sn: String = sound.name // won't let me pass sound.name raw ???
+        recognizedSounds.append((timestamp: now(), soundName: sn))
         tableForRecognizedSounds.reloadData()
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
-            self.flash(0.4, times: 5)
-        })
+        if sound.flashWhenRecognized {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+                self.flash(0.4, times: 5)
+            })
+        }
+        if sound.vibrateWhenRecognized {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+                for var i = 0; i < 5; i++ {
+                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+                    NSThread.sleepForTimeInterval(1)
+                }
+            })
+        }
     }
     
     var ear: Ear?
