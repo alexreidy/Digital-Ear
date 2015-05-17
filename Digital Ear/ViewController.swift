@@ -39,13 +39,16 @@ class ViewController: UIViewController, UITableViewDataSource {
             })
         }
         if sound.vibrateWhenRecognized {
+            ear?.stop()
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
                 for var i = 0; i < 5; i++ {
                     AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
                     NSThread.sleepForTimeInterval(1)
                 }
+                self.ear?.listen()
             })
         }
+        
     }
     
     var ear: Ear?

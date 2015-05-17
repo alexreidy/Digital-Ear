@@ -237,7 +237,9 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         
         soundsRecognizedLastAnalysis = soundsRecognized
         
-        return listen()
+        if !shouldStopRecording {
+            return listen()
+        }
     }
     
     private func recordAudio(toPath path: String, seconds: Double) {
