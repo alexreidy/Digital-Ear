@@ -195,6 +195,11 @@
 					E1A0A2A71AA8D6810002ED74 = {
 						CreatedOnToolsVersion = 6.1.1;
 						DevelopmentTeam = WD2UUUHRPD;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					E1A0A2BC1AA8D6810002ED74 = {
 						CreatedOnToolsVersion = 6.1.1;

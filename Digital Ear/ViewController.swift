@@ -24,15 +24,31 @@ class ViewController: UIViewController, UITableViewDataSource {
     var camera: AVCaptureDevice? = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
     var flashing = false
     
+    var notification = UILocalNotification()
+    
     var recognizedSounds: [(timestamp: Int, soundName: String)] = []
     
     @IBOutlet weak var tableForRecognizedSounds: UITableView!
     
+    func vibrate(times: Int, interval: Double = 1) {
+        for var i = 0; i < times; i++ {
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            NSThread.sleepForTimeInterval(interval)
+        }
+    }
+    
     func onSoundRecognized(sound: Sound) {
-        println("Sounds like \(sound.name)")
+        let slstr = "Sounds like \(sound.name)"
+        println(slstr)
         let sn: String = sound.name // won't let me pass sound.name raw ???
         recognizedSounds.append((timestamp: now(), soundName: sn))
         tableForRecognizedSounds.reloadData()
+        
+        if inBackgroundMode {
+            notification.alertBody = slstr
+            UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+        }
+        
         if sound.flashWhenRecognized {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
                 self.flash(0.4, times: 5)
@@ -40,13 +56,15 @@ class ViewController: UIViewController, UITableViewDataSource {
         }
         if sound.vibrateWhenRecognized {
             ear?.stop()
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
-                for var i = 0; i < 5; i++ {
-                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-                    NSThread.sleepForTimeInterval(1)
-                }
-                self.ear?.listen()
-            })
+            if inBackgroundMode {
+                vibrate(3)
+                ear?.listen()
+            } else {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+                    self.vibrate(5)
+                    self.ear?.listen()
+                })
+            }
         }
         
     }
@@ -139,13 +157,14 @@ class ViewController: UIViewController, UITableViewDataSource {
         
         // NSUserDefaults().setBool(true, forKey: "unlimited") // for testing! Comment out for production.
         
+        UIApplication.sharedApplication().registerUserNotificationSettings(
+            UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert, categories: nil))
+        
         ear = Ear(onSoundRecognized: onSoundRecognized, sampleRate: DEFAULT_SAMPLE_RATE)
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
-            if let e = self.ear {
-                e.listen()
-            }
-        })
+        if let e = self.ear {
+            e.listen()
+        }
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             while true {

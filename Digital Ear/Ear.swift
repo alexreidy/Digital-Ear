@@ -216,9 +216,9 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                         sampleRate: DEFAULT_SAMPLE_RATE)
                 }
                 
-                var maxRelativeFreqDiffForRecognition: Float = 0.16
+                var maxRelativeFreqDiffForRecognition: Float = 0.13
                 if meanDeviation(freqListB) < 250 {
-                    maxRelativeFreqDiffForRecognition = 0.08
+                    maxRelativeFreqDiffForRecognition = 0.07
                 }
                 
                 let averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
