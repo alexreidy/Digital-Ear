@@ -57,6 +57,7 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
         Sound(name: soundNames[row]).delete()
         soundNames.removeAtIndex(row)
         soundTableView.reloadData()
+        NSUserDefaults()
     }
     
     func deleteSoundButtonTapped(sender: AnyObject) {

@@ -107,6 +107,10 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
         sound.deleteRecordingWithFileName(fileName)
         waveformViewCache.removeValueForKey(fileName)
         recordingsTableView.reloadData()
+        if sound.recordings.count == 0 {
+            // To remove associated settings
+            sound.delete()
+        }
     }
     
     func deleteRecButtonTapped(sender: AnyObject) {
@@ -287,6 +291,7 @@ class SoundViewController: UIViewController, AVAudioRecorderDelegate, UITableVie
     }
     
     deinit {
+        // To prevent leaving defaultQueue with a dangling reference:
         SKPaymentQueue.defaultQueue().removeTransactionObserver(self)
     }
     

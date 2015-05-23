@@ -148,6 +148,8 @@ class Sound {
         }
         recordings = []
         save()
+        NSUserDefaults().removeObjectForKey(name + "_SHOULD_VIBRATE")
+        NSUserDefaults().removeObjectForKey(name + "_SHOULD_FLASH")
     }
     
     func save() {
