@@ -30,6 +30,8 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     @IBOutlet weak var tableForRecognizedSounds: UITableView!
     
+    @IBOutlet weak var powerSwitch: UISwitch!
+    
     func vibrate(times: Int, interval: Double = 1) {
         for var i = 0; i < times; i++ {
             AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
@@ -98,7 +100,9 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     @IBAction func unwindToMainView(segue: UIStoryboardSegue) {
-        ear?.listen()
+        if powerSwitch.on {
+            ear?.listen()
+        }
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -155,7 +159,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         // Do any additional setup after loading the view, typically from a nib.
         tableForRecognizedSounds.dataSource = self
         
-        // NSUserDefaults().setBool(true, forKey: "unlimited") // for testing! Comment out for production.
+        NSUserDefaults().setBool(true, forKey: "unlimited")
         
         UIApplication.sharedApplication().registerUserNotificationSettings(
             UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert, categories: nil))

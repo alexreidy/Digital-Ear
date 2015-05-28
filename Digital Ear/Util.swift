@@ -143,10 +143,10 @@ func formatTimeSince(time: Int) -> String {
 }
 
 func canAddSound() -> Bool {
-    if getSoundNames().count < 1 {
+    if NSUserDefaults().boolForKey("unlimited") || getSoundNames().count < 1 {
         return true
     }
-    return NSUserDefaults().boolForKey("unlimited")
+    return false
 }
 
 import StoreKit

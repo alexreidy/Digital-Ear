@@ -181,7 +181,6 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     }
     
     var prevSamplesInQuestion: [Float] = []
-    
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
         if shouldStopRecording { return }
         println("finished recording; processing...")
@@ -303,7 +302,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     func stop() {
         println("stopped listening")
         shouldStopRecording = true
-        stopRecordingAudio()
+        recorder.stop()
     }
 
 }

@@ -59,6 +59,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="powerSwitch" destination="3Ug-sz-iWk" id="wbN-hq-dpV"/>
                         <outlet property="tableForRecognizedSounds" destination="i3C-yd-MnE" id="uwj-vr-5Yz"/>
                     </connections>
                 </viewController>
