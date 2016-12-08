@@ -11,7 +11,7 @@ import UIKit
 
 class WaveformView: UIView {
     
-    private let N_BARS = 5000
+    fileprivate let N_BARS = 5000
     
     var samples: [Float] = []
     
@@ -20,7 +20,7 @@ class WaveformView: UIView {
         self.samples = Ear.adjustForNoiseAndTrimEnds(samples)
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         if samples.count < N_BARS {
             return
         }
@@ -29,15 +29,15 @@ class WaveformView: UIView {
         
         var SAMPLES_PER_BAR: Int = samples.count / N_BARS
         
-        CGContextSetRGBFillColor(ctx, 48.0/255.0, 48.0/255.0, 48.0/255.0, 1.0)
-        CGContextFillRect(ctx, CGRectMake(0, 0, self.frame.width, self.frame.height))
+        ctx?.setFillColor(red: 48.0/255.0, green: 48.0/255.0, blue: 48.0/255.0, alpha: 1.0)
+        ctx?.fill(CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height))
         
-        CGContextSetRGBFillColor(ctx, 31.0/255.0, 239.0/255.0, 156.0/255.0, 1.0)
-        for var k = 0; k < N_BARS; k++ {
+        ctx?.setFillColor(red: 31.0/255.0, green: 239.0/255.0, blue: 156.0/255.0, alpha: 1.0)
+        for k in 0 ..< N_BARS {
             let avgAmplitude: Float = average(Array(samples[k * SAMPLES_PER_BAR..<(k+1) * SAMPLES_PER_BAR]))
-            let r = CGRectMake(CGFloat(Float(k) * dx), CGFloat(self.frame.height/2), CGFloat(dx),
-                CGFloat(avgAmplitude * 5 * Float(self.frame.height)))
-            CGContextFillRect(ctx, r)
+            let r = CGRect(x: CGFloat(Float(k) * dx), y: CGFloat(self.frame.height/2), width: CGFloat(dx),
+                height: CGFloat(avgAmplitude * 5 * Float(self.frame.height)))
+            ctx?.fill(r)
         }
     }
 }

@@ -13,7 +13,7 @@ var sound = Sound(name: "")
 
 class SoundCollectionViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
-    private var soundNames: [String] = []
+    fileprivate var soundNames: [String] = []
     
     @IBOutlet weak var soundTableView: UITableView!
     
@@ -24,22 +24,22 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
         soundNames = getSoundNames()
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return soundNames.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: UITableViewCellStyle.Value2, reuseIdentifier: nil)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: UITableViewCellStyle.value2, reuseIdentifier: nil)
         cell.detailTextLabel?.text = soundNames[indexPath.row]
         
         let deleteButton = UIButton()
-        deleteButton.setTitle("delete", forState: UIControlState.Normal)
+        deleteButton.setTitle("delete", for: UIControlState())
         deleteButton.titleLabel?.font = UIFont(name: "Avenir Next", size: 10)
-        deleteButton.addTarget(self, action: Selector("deleteSoundButtonTapped:"),
-            forControlEvents: UIControlEvents.TouchUpInside)
-        deleteButton.frame = CGRectMake(soundTableView.frame.width - 60, 10, 80, 30)
-        deleteButton.setTitleColor(UIColor.orangeColor(),
-            forState: UIControlState.Normal)
+        deleteButton.addTarget(self, action: #selector(SoundCollectionViewController.deleteSoundButtonTapped(_:)),
+            for: UIControlEvents.touchUpInside)
+        deleteButton.frame = CGRect(x: soundTableView.frame.width - 60, y: 10, width: 80, height: 30)
+        deleteButton.setTitleColor(UIColor.orange,
+            for: UIControlState())
         cell.contentView.addSubview(deleteButton)
         
         deleteButton.tag = indexPath.row
@@ -47,47 +47,47 @@ class SoundCollectionViewController: UIViewController, UITableViewDataSource, UI
         return cell
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         sound = Sound(name: soundNames[indexPath.row])
-        performSegueWithIdentifier("toSoundViewController", sender: sound.name)
+        performSegue(withIdentifier: "toSoundViewController", sender: sound.name)
     }
     
     var row = 0
-    func deleteSound(action: UIAlertAction!) -> Void {
+    func deleteSound(_ action: UIAlertAction!) -> Void {
         Sound(name: soundNames[row]).delete()
-        soundNames.removeAtIndex(row)
+        soundNames.remove(at: row)
         soundTableView.reloadData()
-        NSUserDefaults()
+        UserDefaults()
     }
     
-    func deleteSoundButtonTapped(sender: AnyObject) {
+    func deleteSoundButtonTapped(_ sender: AnyObject) {
         row = sender.tag
         let alert = UIAlertController(title: nil,
             message: "Are you sure you want to delete this sound?",
-            preferredStyle: UIAlertControllerStyle.Alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
-        let deleteAction = UIAlertAction(title: "Yes, delete", style: UIAlertActionStyle.Default,
+            preferredStyle: UIAlertControllerStyle.alert)
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil)
+        let deleteAction = UIAlertAction(title: "Yes, delete", style: UIAlertActionStyle.default,
             handler: deleteSound)
         alert.addAction(cancelAction)
         alert.addAction(deleteAction)
-        presentViewController(alert, animated: true, completion: nil)
+        present(alert, animated: true, completion: nil)
     }
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator
+    override func viewWillTransition(to size: CGSize, with
         coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        super.viewWillTransition(to: size, with: coordinator)
         soundTableView.reloadData()
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let s: AnyObject = sender {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let s: AnyObject = sender as AnyObject? {
             if s is UIButton { // if "Add new" button pressed
                 sound = Sound(name: "")
             }
         }
     }
     
-    @IBAction func unwindToSoundCollectionViewController(segue: UIStoryboardSegue) {
+    @IBAction func unwindToSoundCollectionViewController(_ segue: UIStoryboardSegue) {
         soundNames = getSoundNames()
         soundTableView.reloadData()
     }
