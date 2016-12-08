@@ -109,6 +109,9 @@ func extractSamplesFromWAV(_ path: String) -> [Float] {
     let buffer = AVAudioPCMBuffer(pcmFormat: AVAudioFormat(settings: defaultAudioSettings as! [String: Any]),
         frameCapacity: AVAudioFrameCount(N_SAMPLES))
     
+    guard N_SAMPLES > 0 else {
+        return [Float]()
+    }
     
     do {
         try af.read(into: buffer, frameCount: AVAudioFrameCount(N_SAMPLES))
