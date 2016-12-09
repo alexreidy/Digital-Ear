@@ -21,7 +21,7 @@ let soundsForScreenshot: [(timestamp: Int, soundName: String)] = [
 
 class ViewController: UIViewController, UITableViewDataSource {
     
-    var camera: AVCaptureDevice? = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
+    var camera: AVCaptureDevice? = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
     var flashing = false
     
     var notification = UILocalNotification()
@@ -32,27 +32,27 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     @IBOutlet weak var powerSwitch: UISwitch!
     
-    func vibrate(times: Int, interval: Double = 1) {
-        for var i = 0; i < times; i++ {
+    func vibrate(_ times: Int, interval: Double = 1) {
+        for i in 0 ..< times {
             AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-            NSThread.sleepForTimeInterval(interval)
+            Thread.sleep(forTimeInterval: interval)
         }
     }
     
-    func onSoundRecognized(sound: Sound) {
+    func onSoundRecognized(_ sound: Sound) {
         let slstr = "Sounds like \(sound.name)"
-        println(slstr)
+        print(slstr)
         let sn: String = sound.name // won't let me pass sound.name raw ???
         recognizedSounds.append((timestamp: now(), soundName: sn))
         tableForRecognizedSounds.reloadData()
         
         if inBackgroundMode {
             notification.alertBody = slstr
-            UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+            UIApplication.shared.presentLocalNotificationNow(notification)
         }
         
         if sound.flashWhenRecognized {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+            DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.background).async(execute: {
                 self.flash(0.4, times: 5)
             })
         }
@@ -62,7 +62,7 @@ class ViewController: UIViewController, UITableViewDataSource {
                 vibrate(3)
                 ear?.listen()
             } else {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+                DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.background).async(execute: {
                     self.vibrate(5)
                     self.ear?.listen()
                 })
@@ -73,10 +73,10 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     var ear: Ear?
     
-    @IBAction func onButtonToggled(sender: AnyObject) {
+    @IBAction func onButtonToggled(_ sender: AnyObject) {
         if sender is UISwitch {
             let s: UISwitch = sender as! UISwitch
-            if s.on {
+            if s.isOn {
                 ear?.listen()
             } else {
                 ear?.stop()
@@ -84,12 +84,12 @@ class ViewController: UIViewController, UITableViewDataSource {
         }
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return recognizedSounds.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: UITableViewCellStyle.Value2, reuseIdentifier: nil)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell(style: UITableViewCellStyle.value2, reuseIdentifier: nil)
         
         let rs = recognizedSounds[recognizedSounds.count - 1 - indexPath.row]
         let minutesSinceRecognized: Int = Int(floor(Double(now() - rs.timestamp) / 60.0))
@@ -99,42 +99,42 @@ class ViewController: UIViewController, UITableViewDataSource {
         return cell
     }
     
-    @IBAction func unwindToMainView(segue: UIStoryboardSegue) {
-        if powerSwitch.on {
+    @IBAction func unwindToMainView(_ segue: UIStoryboardSegue) {
+        if powerSwitch.isOn {
             ear?.listen()
         }
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         ear?.stop()
         if let cam = camera {
-            cam.lockForConfiguration(nil)
-            if cam.isTorchModeSupported(AVCaptureTorchMode.Off) {
-                cam.torchMode = AVCaptureTorchMode.Off
+            try! cam.lockForConfiguration()
+            if cam.isTorchModeSupported(AVCaptureTorchMode.off) {
+                cam.torchMode = AVCaptureTorchMode.off
             }
             cam.unlockForConfiguration()
         }
     }
     
-    func setFlashLevel(level: Float) {
+    func setFlashLevel(_ level: Float) {
         if let cam = camera {
-            cam.lockForConfiguration(nil)
-            if cam.hasTorch && cam.isTorchModeSupported(AVCaptureTorchMode.Off) &&
-                cam.isTorchModeSupported(AVCaptureTorchMode.On) {
-                if cam.torchAvailable {
+            try? cam.lockForConfiguration()
+            if cam.hasTorch && cam.isTorchModeSupported(AVCaptureTorchMode.off) &&
+                cam.isTorchModeSupported(AVCaptureTorchMode.on) {
+                if cam.isTorchAvailable {
                     if level == 0 {
-                        cam.torchMode = AVCaptureTorchMode.Off
+                        cam.torchMode = AVCaptureTorchMode.off
                     } else {
-                        cam.setTorchModeOnWithLevel(level, error: nil)
+                        try? cam.setTorchModeOnWithLevel(level)
                     }
                 }
-            } else if cam.hasFlash && cam.isFlashModeSupported(AVCaptureFlashMode.Off) &&
-                cam.isFlashModeSupported(AVCaptureFlashMode.On) {
-                if cam.flashAvailable {
+            } else if cam.hasFlash && cam.isFlashModeSupported(AVCaptureFlashMode.off) &&
+                cam.isFlashModeSupported(AVCaptureFlashMode.on) {
+                if cam.isFlashAvailable {
                     if level == 0 {
-                        cam.flashMode = AVCaptureFlashMode.Off
+                        cam.flashMode = AVCaptureFlashMode.off
                     } else {
-                        cam.flashMode = AVCaptureFlashMode.On
+                        cam.flashMode = AVCaptureFlashMode.on
                     }
                 }
             }
@@ -142,14 +142,15 @@ class ViewController: UIViewController, UITableViewDataSource {
         }
     }
     
-    func flash(interval: Double, times: Int) {
+    func flash(_ interval: Double, times: Int) {
         // interval is in seconds
         if flashing { return }
         flashing = true
         var on = true
-        for var i = 0; i < times * 2; i++, on = !on {
+        for i in 0 ..< times * 2 {
             if on { setFlashLevel(0.9) } else { setFlashLevel(0) }
-            NSThread.sleepForTimeInterval(interval)
+            Thread.sleep(forTimeInterval: interval)
+            on = !on
         }
         flashing = false
     }
@@ -159,10 +160,10 @@ class ViewController: UIViewController, UITableViewDataSource {
         // Do any additional setup after loading the view, typically from a nib.
         tableForRecognizedSounds.dataSource = self
         
-        NSUserDefaults().setBool(true, forKey: "unlimited")
+        UserDefaults().set(true, forKey: "unlimited")
         
-        UIApplication.sharedApplication().registerUserNotificationSettings(
-            UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert, categories: nil))
+        UIApplication.shared.registerUserNotificationSettings(
+            UIUserNotificationSettings(types: UIUserNotificationType.alert, categories: nil))
         
         ear = Ear(onSoundRecognized: onSoundRecognized, sampleRate: DEFAULT_SAMPLE_RATE)
         
@@ -170,12 +171,12 @@ class ViewController: UIViewController, UITableViewDataSource {
             e.listen()
         }
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+        DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.background).async(execute: {
             while true {
-                NSOperationQueue.mainQueue().addOperationWithBlock({
+                OperationQueue.main.addOperation({
                     self.tableForRecognizedSounds.reloadData()
                 })
-                NSThread.sleepForTimeInterval(5)
+                Thread.sleep(forTimeInterval: 5)
             }
         })
         

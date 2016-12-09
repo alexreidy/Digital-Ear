@@ -17,22 +17,22 @@ var utilAudioRecorder: AVAudioRecorder?
 var utilAudioPlayer: AVAudioPlayer?
 
 let DEFAULT_SAMPLE_RATE = 44100
-let defaultAudioSettings: [NSObject : AnyObject] = [
+let defaultAudioSettings: [AnyHashable: Any] = [
     AVFormatIDKey: kAudioFormatLinearPCM,
     AVLinearPCMIsFloatKey: true,
     AVNumberOfChannelsKey: 1,
     AVSampleRateKey: DEFAULT_SAMPLE_RATE,
 ]
 
-func timestampDouble() -> Double { return NSDate().timeIntervalSince1970 }
+func timestampDouble() -> Double { return Date().timeIntervalSince1970 }
 func now() -> Int { return time(nil) }
 
-func sign(x: Float) -> Int {
+func sign(_ x: Float) -> Int {
     if x < 0 { return -1 }
     return 1
 }
 
-func max(nums: [Float]) -> Float {
+func max(_ nums: [Float]) -> Float {
     var max: Float = -MAXFLOAT
     for n in nums {
         if n > max {
@@ -42,7 +42,7 @@ func max(nums: [Float]) -> Float {
     return max
 }
 
-func average(data: [Float], absolute: Bool = false) -> Float {
+func average(_ data: [Float], absolute: Bool = false) -> Float {
     // If absolute, return the average absolute distance from zero
     var sum: Float = 0
     for x in data {
@@ -58,11 +58,10 @@ func average(data: [Float], absolute: Bool = false) -> Float {
 func startRecordingAudio(toPath path: String, delegate: AVAudioRecorderDelegate? = nil,
     seconds: Double = MAX_REC_DURATION) {
     // if utilAudioRecorder == nil ??? don't want to record while recording...
-    utilAudioRecorder = AVAudioRecorder(URL: NSURL(fileURLWithPath: path),
-        settings: defaultAudioSettings, error: nil)
+    utilAudioRecorder = try! AVAudioRecorder(url: URL(fileURLWithPath: path), settings: defaultAudioSettings as! [String: Any])
     if let recorder = utilAudioRecorder {
         recorder.delegate = delegate
-        recorder.recordForDuration(seconds)
+        recorder.record(forDuration: seconds)
     }
 }
 
@@ -75,48 +74,63 @@ func stopRecordingAudio() {
 
 func recording() -> Bool {
     if let recorder = utilAudioRecorder {
-        return recorder.recording
+        return recorder.isRecording
     }
     return false
 }
 
-func playAudio(filePath: String) {
-    utilAudioSession.setCategory(AVAudioSessionCategoryPlayAndRecord, error: nil)
-    utilAudioPlayer = AVAudioPlayer(contentsOfURL: NSURL(fileURLWithPath: filePath), error:nil)
+func playAudio(_ filePath: String) {
+    try! utilAudioSession.setCategory(AVAudioSessionCategoryPlayAndRecord)
+    utilAudioPlayer = try! AVAudioPlayer(contentsOf: URL(fileURLWithPath: filePath))
     if let player = utilAudioPlayer {
         player.volume = 1
         if player.play() {
-            println("playing")
+            print("playing")
         }
     }
 }
 
-func extractSamplesFromWAV(path: String) -> [Float] {
-    var af = AVAudioFile(forReading: NSURL(fileURLWithPath: path),
-        commonFormat: AVAudioCommonFormat.PCMFormatFloat32,
-        interleaved: false, error: nil)
-    
-    if af == nil {
-        println("Error opening audio file with path \(path)")
-        return []
+func extractSamplesFromWAV(_ path: String) -> [Float] {
+    let audioFile: AVAudioFile?
+    do {
+        audioFile = try AVAudioFile(forReading: URL(fileURLWithPath: path), commonFormat: AVAudioCommonFormat.pcmFormatFloat32, interleaved: false)
+    } catch {
+        audioFile = nil
+        print("Error opening audio file with path \(path), and error: \(error)")
+        return [Float]()
+    }
+
+    guard let af = audioFile else {
+        return [Float]()
     }
     
     let N_SAMPLES = Int(af.length)
     
-    var buffer = AVAudioPCMBuffer(PCMFormat: AVAudioFormat(settings: defaultAudioSettings),
+    let buffer = AVAudioPCMBuffer(pcmFormat: AVAudioFormat(settings: defaultAudioSettings as! [String: Any]),
         frameCapacity: AVAudioFrameCount(N_SAMPLES))
     
-    af.readIntoBuffer(buffer, error: nil)
+    guard N_SAMPLES > 0 else {
+        return [Float]()
+    }
     
-    var samples = [Float](count: N_SAMPLES, repeatedValue: 0.0)
-    for var i = 0; i < N_SAMPLES; i++ {
-        samples[i] = buffer.floatChannelData.memory[i]
+    do {
+        try af.read(into: buffer, frameCount: AVAudioFrameCount(N_SAMPLES))
+    } catch {
+        print("problem reading \(error)")
+        return [Float]()
+    }
+    
+    var samples = [Float](repeating: 0.0, count: N_SAMPLES)
+    for i in 0 ..< N_SAMPLES {
+        if let data = buffer.floatChannelData {
+            samples[i] = data.pointee[i]
+        }
     }
     
     return samples
 }
 
-func formatTimeBetween(startTime: Int, endTime: Int) -> String {
+func formatTimeBetween(_ startTime: Int, endTime: Int) -> String {
     if endTime < startTime { return "error" }
     let secondsElapsed = endTime - startTime
     if secondsElapsed >= 3600 * 24 {
@@ -138,12 +152,12 @@ func formatTimeBetween(startTime: Int, endTime: Int) -> String {
     return "\(secondsElapsed)s"
 }
 
-func formatTimeSince(time: Int) -> String {
-    return formatTimeBetween(time, now())
+func formatTimeSince(_ time: Int) -> String {
+    return formatTimeBetween(time, endTime: now())
 }
 
 func canAddSound() -> Bool {
-    if NSUserDefaults().boolForKey("unlimited") || getSoundNames().count < 1 {
+    if UserDefaults().bool(forKey: "unlimited") || getSoundNames().count < 1 {
         return true
     }
     return false
@@ -153,10 +167,10 @@ import StoreKit
 extension SKProduct {
     // Thanks to Ben Dodson
     func localizedPrice() -> String {
-        let formatter = NSNumberFormatter()
-        formatter.numberStyle = .CurrencyStyle
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
         formatter.locale = self.priceLocale
-        return formatter.stringFromNumber(self.price)!
+        return formatter.string(from: self.price)!
     }
     
 }

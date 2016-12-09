@@ -11,35 +11,35 @@ import AVFoundation
 
 class Ear: NSObject, AVAudioRecorderDelegate {
     
-    private let audioSession = AVAudioSession()
+    fileprivate let audioSession = AVAudioSession()
     
-    private var recorder: AVAudioRecorder!
+    fileprivate var recorder: AVAudioRecorder!
     
-    var settings = defaultAudioSettings
+    var settings: [String: Any] = defaultAudioSettings as! [String: Any]
     
-    private var onSoundRecognized: (sound: Sound) -> ()
+    fileprivate var onSoundRecognized: (_ sound: Sound) -> ()
     var soundsRecognizedLastAnalysis = Set<String>()
     
-    private var shouldStopRecording = false
+    fileprivate var shouldStopRecording = false
     
-    private var sounds: [Sound] = []
-    private var freqListForWAV = [String : [Float]]() // cache
+    fileprivate var sounds: [Sound] = []
+    fileprivate var freqListForWAV = [String : [Float]]() // cache
     
-    private let secondsToRecord: Double = 7
+    fileprivate let secondsToRecord: Double = 7
     
-    private let tempWav = "tmp.wav"
+    fileprivate let tempWav = "tmp.wav"
         
-    init(onSoundRecognized: (sound: Sound) -> (), sampleRate: Int) {
+    init(onSoundRecognized: @escaping (_ sound: Sound) -> (), sampleRate: Int) {
         self.onSoundRecognized = onSoundRecognized
         
-        audioSession.setCategory(AVAudioSessionCategoryRecord, error: nil)
-        audioSession.setMode(AVAudioSessionModeMeasurement, error: nil)
-        audioSession.setActive(true, error: nil)
+        try! audioSession.setCategory(AVAudioSessionCategoryRecord)
+        try! audioSession.setMode(AVAudioSessionModeMeasurement)
+        try! audioSession.setActive(true)
         
         settings[AVSampleRateKey] = sampleRate
     }
     
-    class func adjustForNoiseAndTrimEnds(samples: [Float]) -> [Float] {
+    class func adjustForNoiseAndTrimEnds(_ samples: [Float]) -> [Float] {
         // At low amplitudes, the fluctuation across "zero" due to noise
         // is actually quite pronounced, resulting in high frequencies when
         // it's quiet, so we basically change all of the negligibly small amplitudes to zero.
@@ -50,10 +50,10 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         
         let SAMPLES_PER_CHUNK = DEFAULT_SAMPLE_RATE / 4
         
-        for var k = 0; k < samples.count / SAMPLES_PER_CHUNK; k++ {
+        for k in 0 ..< samples.count / SAMPLES_PER_CHUNK {
             let chunk: [Float] = Array(noiseAdjustedSamples[k * SAMPLES_PER_CHUNK ..< (k+1) * SAMPLES_PER_CHUNK])
             if abs(average(chunk, absolute: true)) < 0.0001 {
-                for var i = k * SAMPLES_PER_CHUNK; i < (k+1) * SAMPLES_PER_CHUNK; i++ {
+                for i in k * SAMPLES_PER_CHUNK ..< (k+1) * SAMPLES_PER_CHUNK {
                     noiseAdjustedSamples[i] = 0.0
                 }
                 continue
@@ -68,7 +68,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             firstNonzeroAmplitudeIndex..<lastNonzeroAmplitudeIndex])
     }
     
-    class func countCyclesIn(samples: [Float]) -> Int {
+    class func countCyclesIn(_ samples: [Float]) -> Int {
         if samples.count == 0 { return 0 }
         
         var zeroCrossings = 0
@@ -77,7 +77,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         for amplitude in samples {
             var currentSign = sign(amplitude)
             if currentSign == -prevSign {
-                zeroCrossings++
+                zeroCrossings += 1
             }
             prevSign = currentSign
         }
@@ -85,13 +85,13 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         return Int(round(Float(zeroCrossings) / 2.0))
     }
     
-    class func countFrequencyIn(samples: [Float], sampleRate: Int) -> Float {
+    class func countFrequencyIn(_ samples: [Float], sampleRate: Int) -> Float {
         let cycles = countCyclesIn(samples)
         let seconds: Float = Float(samples.count) / Float(sampleRate)
         return Float(cycles) / seconds
     }
     
-    private func range(data: [Float]) -> Float {
+    fileprivate func range(_ data: [Float]) -> Float {
         var max = -MAXFLOAT, min = MAXFLOAT
         for x in data {
             if x > max { max = x }
@@ -100,7 +100,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         return max - min
     }
     
-    private func meanDeviation(data: [Float]) -> Float {
+    fileprivate func meanDeviation(_ data: [Float]) -> Float {
         var deviationSum: Float = 0
         let mean = average(data)
         for x in data {
@@ -109,7 +109,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         return deviationSum / Float(data.count)
     }
     
-    private func createFrequencyArray(samples: [Float], sampleRate: Int, freqChunksPerSec: Int = 50) -> [Float] {
+    fileprivate func createFrequencyArray(_ samples: [Float], sampleRate: Int, freqChunksPerSec: Int = 50) -> [Float] {
         // TODO - refactor with slices (?)
         
         let samplesPerChunk = sampleRate / freqChunksPerSec
@@ -120,9 +120,10 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         }
         
         var freqArray: [Float] = []
-        var samplesForChunk = [Float](count: samplesPerChunk, repeatedValue: 0.0)
+        var samplesForChunk = [Float](repeating: 0.0, count: samplesPerChunk)
+        var i = 0
         
-        for var n = 0, i = 0; n < samples.count; n++, i++ {
+        for n in 0 ..< samples.count {
             if i == samplesForChunk.count {
                 freqArray.append(Ear.countFrequencyIn(samplesForChunk, sampleRate: sampleRate))
                 i = 0
@@ -130,12 +131,13 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             }
             
             samplesForChunk[i] = samples[n]
+            i += 1
         }
         
         return freqArray
     }
     
-    private func calcAverageRelativeFreqDiff(freqListA: [Float], freqListB: [Float]) -> Float {
+    fileprivate func calcAverageRelativeFreqDiff(_ freqListA: [Float], freqListB: [Float]) -> Float {
         // We "slide" the smaller freqList across the larger one and compare each frequency
         // to compute the minimum average relative difference in frequency (a proportion)
         
@@ -161,9 +163,10 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         let freqListLenDiff = largeFreqList.count - smallFreqList.count
         var minAvgRelativeFreqDiff: Float = 1
 
-        for (var indexOffset = 0; indexOffset <= freqListLenDiff; indexOffset++) {
+        for indexOffset in 0 ... freqListLenDiff {
             var relativeFreqDiffSum: Float = 0
-            for (var i = 0; i < smallFreqList.count; i++) {
+
+            for i in 0 ..< smallFreqList.count {
                 let base: Float = max(smallFreqList[i], largeFreqList[i + indexOffset])
                 if base > 0 {
                     relativeFreqDiffSum += abs(smallFreqList[i] - largeFreqList[i + indexOffset]) / base
@@ -181,9 +184,9 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     }
     
     var prevSamplesInQuestion: [Float] = []
-    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder!, successfully flag: Bool) {
         if shouldStopRecording { return }
-        println("finished recording; processing...")
+        print("finished recording; processing...")
         
         let sampleRate = settings[AVSampleRateKey] as! Int
         var samplesInQuestion = prevSamplesInQuestion
@@ -203,14 +206,13 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         
         for sound in sounds {
             for rec in sound.recordings {
-                let fileName = rec.valueForKey("fileName") as! String
+                let fileName = rec.value(forKey: "fileName") as! String
                 
                 var freqListB: [Float] = []
                 if let freqList = freqListForWAV[fileName] {
                     freqListB = freqList
                 } else {
-                    var samplesInSavedRecording = Ear.adjustForNoiseAndTrimEnds(
-                        extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav"))
+                    var samplesInSavedRecording = extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav") // Ear.adjustForNoiseAndTrimEnds(extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav"))
                     freqListB = createFrequencyArray(samplesInSavedRecording,
                         sampleRate: DEFAULT_SAMPLE_RATE)
                 }
@@ -221,11 +223,11 @@ class Ear: NSObject, AVAudioRecorderDelegate {
                 }
                 
                 let averageFreqDiff = calcAverageRelativeFreqDiff(freqListA, freqListB: freqListB)
-                println(sound.name + " \(averageFreqDiff)")
+                print(sound.name + " \(averageFreqDiff)")
                 
                 if averageFreqDiff <= maxRelativeFreqDiffForRecognition {
                     if !soundsRecognizedLastAnalysis.contains(sound.name) {
-                        onSoundRecognized(sound: sound)
+                        onSoundRecognized(sound)
                         soundsRecognized.insert(sound.name)
                     }
                     // Sound has been recognized, so we don't analyze any more of its recordings
@@ -241,15 +243,14 @@ class Ear: NSObject, AVAudioRecorderDelegate {
         }
     }
     
-    private func recordAudio(toPath path: String, seconds: Double) {
-        recorder = AVAudioRecorder(URL: NSURL(fileURLWithPath: path),
-            settings: settings, error: nil)
+    fileprivate func recordAudio(toPath path: String, seconds: Double) {
+        recorder = try! AVAudioRecorder(url: URL(fileURLWithPath: path), settings: settings)
         recorder.delegate = self
-        recorder.recordForDuration(seconds)
+        recorder.record(forDuration: seconds)
     }
     
-    private var lastFreqCacheUpdateTime = now() - 60
-    private var shouldTryFreqCacheUpdate: Bool {
+    fileprivate var lastFreqCacheUpdateTime = now() - 60
+    fileprivate var shouldTryFreqCacheUpdate: Bool {
         get {
             let time = now()
             if time - lastFreqCacheUpdateTime >= 30 {
@@ -261,19 +262,19 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     }
     
     func listen() {
-        println("going to listen")
+        print("going to listen")
         shouldStopRecording = false
         
         if shouldTryFreqCacheUpdate {
             sounds = getSounds()
-            println("trying freq cache update")
+            print("trying freq cache update")
             var fileNames: [String] = []
             for sound in sounds {
                 for rec in sound.recordings {
-                    let fileName = rec.valueForKey("fileName") as! String
+                    let fileName = rec.value(forKey: "fileName") as! String
                     fileNames.append(fileName)
-                    if !contains(freqListForWAV.keys, fileName) {
-                        println("adding freqList to cache")
+                    if !freqListForWAV.keys.contains(fileName) {
+                        print("adding freqList to cache")
                         freqListForWAV[fileName] = createFrequencyArray(Ear.adjustForNoiseAndTrimEnds(
                             extractSamplesFromWAV(DOCUMENT_DIR+"\(fileName).wav")),
                             sampleRate: DEFAULT_SAMPLE_RATE)
@@ -283,9 +284,9 @@ class Ear: NSObject, AVAudioRecorderDelegate {
             // If there's a freqList in the cache with a fileName that
             // no longer exists, delete dict entry.
             for fn in freqListForWAV.keys {
-                if !contains(fileNames, fn) {
-                    println("removing freqList from cache")
-                    freqListForWAV.removeValueForKey(fn)
+                if !fileNames.contains(fn) {
+                    print("removing freqList from cache")
+                    freqListForWAV.removeValue(forKey: fn)
                 }
             }
         }
@@ -300,7 +301,7 @@ class Ear: NSObject, AVAudioRecorderDelegate {
     }
     
     func stop() {
-        println("stopped listening")
+        print("stopped listening")
         shouldStopRecording = true
         recorder.stop()
     }
